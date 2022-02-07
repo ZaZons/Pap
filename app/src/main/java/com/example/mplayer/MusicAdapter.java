@@ -48,14 +48,9 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
             holder.rootLayout.setBackgroundResource(R.drawable.back_10);
         }
 
-        String generateDuration = String.format(Locale.getDefault(), "%02d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(Long.parseLong(list2.getDuration())),
-                TimeUnit.MILLISECONDS.toSeconds(Long.parseLong(list2.getDuration())),
-                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(Long.parseLong(list2.getDuration()))));
-
         holder.title.setText(list2.getTitle());
         holder.artist.setText(list2.getArtist());
-        holder.musicDuration.setText(generateDuration);
+        holder.musicDuration.setText(list2.getDuration());
 
         holder.rootLayout.setOnClickListener(v -> {
             list.get(playingPosition).setPlaying(false);

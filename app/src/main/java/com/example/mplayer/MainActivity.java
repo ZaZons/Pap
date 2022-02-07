@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.Manifest;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -66,8 +67,8 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         previousBtn = findViewById(R.id.previousBtn);
         playPauseCard = findViewById(R.id.playPauseCard);
         searchBtn = findViewById(R.id.searchBtn);
-        endTime = findViewById(R.id.startTime);
-        startTime = findViewById(R.id.endTime);
+        startTime = findViewById(R.id.startTime);
+        endTime = findViewById(R.id.endTime);
         playerSeekbar = findViewById(R.id.playerSeekBar);
 
         musicRecyclerView.setHasFixedSize(false);
@@ -78,6 +79,19 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         musicView.setPlayer(player);
 
         requestPermission();
+
+        playPauseCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isPlaying) {
+                    isPlaying = false;
+                    player.pause();
+                    playPauseImg.setImageResource(R.drawable.ic_play_arrow);
+                } else {
+                    play();
+                }
+            }
+        });
     }
 
     void findSongs() {
@@ -85,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
             ContentResolver contentResolver = getApplicationContext().getContentResolver();
 
             Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-            String sortOrder = MediaStore.Audio.Media.DATE_ADDED;
+            String sortOrder = MediaStore.Audio.Media.DATE_ADDED + " DESC";
             String[] selectionArgs = {"%.mp3%", "%.wav", "%.m4a"};
             String selection = MediaStore.Audio.AudioColumns.IS_MUSIC;
             String[] projection = {MediaStore.Audio.Media.DATE_ADDED};
@@ -98,25 +112,36 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 Toast.makeText(this, "No music found", Toast.LENGTH_SHORT).show();
             } else {
                 cursor.moveToFirst();
-                int x = 0;
+                int x = 0; //para remover no fim
                 do {
-                    x++;
+                    x++; //para remover no fim
                     long cursorId = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
                     Uri musicFileUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cursorId);
                     final String getMusicFileName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
                     final String getArtistName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
-                    String getDuration = "00:00";
-                    getDuration = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DURATION));
+                    String getDuration = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DURATION));
+
+                    long time = Long.parseLong(getDuration);
+                    long seconds = time / 1000;
+                    long minutes = seconds / 60;
+                    seconds = seconds % 60;
+
+                    String stringedMinutes = Long.toString(minutes);
+                    String stringedSeconds = Long.toString(seconds);
+
+                    if(seconds < 10) getDuration = stringedMinutes + ":0" + stringedSeconds;
+                    else getDuration = stringedMinutes + ":" + stringedSeconds;
 
                     final MusicList musicList = new MusicList(getMusicFileName, getArtistName, getDuration, false, musicFileUri);
                     musicLists.add(musicList);
-                    if(x == 104) break;
+
+                    if(x == 104) break; //para remover no fim
                 } while(cursor.moveToNext());
                 Toast.makeText(this, x + " Songs found", Toast.LENGTH_SHORT).show();
                 Log.d("FindSongs", x + " Songs found");
                 musicRecyclerView.setAdapter(new MusicAdapter(musicLists, MainActivity.this));
+                cursor.close();
             }
-            assert cursor != null;
         } catch (Exception e) {
             Log.e("FindSongs error", "Error: " + e.getMessage());
         }
@@ -128,23 +153,16 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         MediaItem mediaItem = MediaItem.fromUri(musicItem.getMusicFile());
         player.setMediaItem(mediaItem);
         player.prepare();
-        player.play();
         String generateDuration = musicItem.getDuration();
-        playerSeekbar.setMax(1);
-        playPauseImg.setImageResource(R.drawable.btn_pause);
         endTime.setText(generateDuration);
+
+        play();
+    }
+
+    void play() {
         isPlaying = true;
-        /*
-
-
-        mediaPlayer.setOnPreparedListener(mediaPlayer -> {
-            final int getTotalDuration = mediaPlayer.getDuration();
-
-
-
-            //mediaPlayer.start();
-
-        });*/
+        player.play();
+        playPauseImg.setImageResource(R.drawable.btn_pause);
     }
 
     void requestPermission()     {
