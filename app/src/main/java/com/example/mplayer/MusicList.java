@@ -4,9 +4,9 @@ import android.net.Uri;
 
 public class MusicList {
 
-    private String title, artist, duration;
     private boolean isPlaying;
-    private Uri musicFile;
+    private final String title, artist, duration;
+    private final Uri musicFile;
 
     public MusicList(String title, String artist, String duration, boolean isPlaying, Uri musicFile) {
         this.title = title;

@@ -36,9 +36,6 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements ChangeSongListener {
-
-    //ListView listView;
-
     CardView playPauseCard;
     ImageView nextBtn;
     ImageView previousBtn;
@@ -47,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
     private boolean isPlaying = false;
     private RecyclerView musicRecyclerView;
-    private MediaPlayer mediaPlayer;
     private TextView endTime, startTime;
     private SeekBar playerSeekbar;
     private ImageView playPauseImg;
@@ -55,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     ExoPlayer player;
 
     private final List<MusicList> musicLists = new ArrayList<>();
+    private MusicAdapter musicAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,7 +136,9 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 } while(cursor.moveToNext());
                 Toast.makeText(this, x + " Songs found", Toast.LENGTH_SHORT).show();
                 Log.d("FindSongs", x + " Songs found");
-                musicRecyclerView.setAdapter(new MusicAdapter(musicLists, MainActivity.this));
+
+                musicAdapter = new MusicAdapter(musicLists, MainActivity.this);
+                musicRecyclerView.setAdapter(musicAdapter);
                 cursor.close();
             }
         } catch (Exception e) {
@@ -149,13 +148,21 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
     @Override
     public void onChanged(int position) {
-        MusicList musicItem = musicLists.get(position);
-        MediaItem mediaItem = MediaItem.fromUri(musicItem.getMusicFile());
+        MusicList firstItem = musicLists.get(position);
+        MediaItem mediaItem = MediaItem.fromUri(firstItem.getMusicFile());
+        String generateDuration = firstItem.getDuration();
+
         player.setMediaItem(mediaItem);
-        player.prepare();
-        String generateDuration = musicItem.getDuration();
         endTime.setText(generateDuration);
 
+        Log.d("Fds", "numero de itens: " + musicAdapter.getItemCount());
+        for(int i = position + 1; i < position - 1; i++) {
+            MusicList nextItem = musicLists.get(i);
+            MediaItem nextMediaItem = MediaItem.fromUri(nextItem.getMusicFile());
+            player.addMediaItem(nextMediaItem);
+        }
+
+        player.prepare();
         play();
     }
 
@@ -165,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         playPauseImg.setImageResource(R.drawable.btn_pause);
     }
 
-    void requestPermission()     {
+    void requestPermission() {
         Dexter.withContext(this)
                 .withPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                 .withListener(new PermissionListener() {
