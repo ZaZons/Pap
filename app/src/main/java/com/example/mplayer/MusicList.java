@@ -2,11 +2,14 @@ package com.example.mplayer;
 
 import android.net.Uri;
 
+import com.google.android.exoplayer2.MediaItem;
+
 public class MusicList {
 
     private boolean isPlaying;
     private final String title, artist, duration;
     private final Uri musicFile;
+    private final MediaItem mediaItem;
 
     public MusicList(String title, String artist, String duration, boolean isPlaying, Uri musicFile) {
         this.title = title;
@@ -14,6 +17,7 @@ public class MusicList {
         this.duration = duration;
         this.isPlaying = isPlaying;
         this.musicFile = musicFile;
+        this.mediaItem = MediaItem.fromUri(musicFile);
     }
 
     public String getTitle() {
@@ -35,6 +39,8 @@ public class MusicList {
     public Uri getMusicFile() {
         return musicFile;
     }
+
+    public MediaItem getMediaItem() {return mediaItem;}
 
     public void setPlaying(boolean playing) {
         isPlaying = playing;

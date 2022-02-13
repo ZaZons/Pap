@@ -1,5 +1,6 @@
 package com.example.mplayer;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -7,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerControlView;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -18,7 +20,6 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.database.Cursor;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.Manifest;
@@ -33,6 +34,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 
 public class MainActivity extends AppCompatActivity implements ChangeSongListener {
@@ -48,7 +51,11 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     private SeekBar playerSeekbar;
     private ImageView playPauseImg;
     private StyledPlayerControlView musicView;
+    private int playingPosition;
+    private MusicList currentMusicList;
+
     ExoPlayer player;
+    ExoPlayer.Listener playerListener;
 
     private final List<MusicList> musicLists = new ArrayList<>();
     private MusicAdapter musicAdapter;
@@ -74,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         musicView = findViewById(R.id.playerView);
         player = new ExoPlayer.Builder(this).build();
         musicView.setPlayer(player);
+        player.setRepeatMode(Player.REPEAT_MODE_ALL);
 
         requestPermission();
 
@@ -89,6 +97,48 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 }
             }
         });
+
+        nextBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(player.hasNextMediaItem())
+                    player.seekToNextMediaItem();
+            }
+        });
+
+        previousBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(player.hasPreviousMediaItem()) {
+                    player.seekToPreviousMediaItem();
+                }
+            }
+        });
+
+        player.addListener(new ExoPlayer.Listener() {
+            @Override
+            public void onIsPlayingChanged(boolean isPlaying) {
+                long realDurationMillis = player.getDuration();
+            }
+
+            @Override
+            public void onMediaItemTransition(MediaItem newMediaItem, @com.google.android.exoplayer2.Player.MediaItemTransitionReason int reason) {
+                //Stream<MusicList> mediaItem = musicLists.stream().filter(music -> newMediaItem.equals(music.getMediaItem()));
+                //Log.d("fds", ": " + musicLists.stream().filter(music -> newMediaItem.equals(music.getMediaItem())));
+
+                if(currentMusicList != null) {
+                    currentMusicList.setPlaying(false);
+                }
+
+                for(MusicList m : musicLists)
+                    if(m.getMediaItem().equals(newMediaItem)) currentMusicList = m;
+
+                currentMusicList.setPlaying(true);
+
+                musicAdapter.notifyDataSetChanged();
+                //Log.d("fds", ": " + newMediaItem);
+            }
+        });
     }
 
     void findSongs() {
@@ -97,9 +147,12 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
             Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             String sortOrder = MediaStore.Audio.Media.DATE_ADDED + " DESC";
+
+            /*
             String[] selectionArgs = {"%.mp3%", "%.wav", "%.m4a"};
             String selection = MediaStore.Audio.AudioColumns.IS_MUSIC;
             String[] projection = {MediaStore.Audio.Media.DATE_ADDED};
+            */
 
             Cursor cursor = contentResolver.query(uri, null, null, null, sortOrder);
 
@@ -148,26 +201,33 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
     @Override
     public void onChanged(int position) {
+        player.stop();
+        player.clearMediaItems();
+
+        playingPosition = position;
         MusicList firstItem = musicLists.get(position);
-        MediaItem mediaItem = MediaItem.fromUri(firstItem.getMusicFile());
-        String generateDuration = firstItem.getDuration();
+        MediaItem mediaItem = firstItem.getMediaItem();
+        //long generateDuration = player.getDuration();
 
-        player.setMediaItem(mediaItem);
-        endTime.setText(generateDuration);
+        player.addMediaItem(mediaItem);
+        endTime.setText(firstItem.getDuration());
+        //startTime.setText((int) player.getCurrentPosition());
 
-        Log.d("Fds", "numero de itens: " + musicAdapter.getItemCount());
-        for(int i = position + 1; i < position - 1; i++) {
+        for(int i = position + 1; i < musicAdapter.getItemCount() + 1; i++) {
+            if(i == musicAdapter.getItemCount()) i = 0;
+            if(i == position) break;
+
             MusicList nextItem = musicLists.get(i);
             MediaItem nextMediaItem = MediaItem.fromUri(nextItem.getMusicFile());
             player.addMediaItem(nextMediaItem);
         }
 
-        player.prepare();
         play();
     }
 
     void play() {
         isPlaying = true;
+        player.prepare();
         player.play();
         playPauseImg.setImageResource(R.drawable.btn_pause);
     }

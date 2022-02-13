@@ -20,13 +20,11 @@ import java.util.concurrent.TimeUnit;
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder> {
 
     private final List<MusicList> list;
-    private final Context context;
     private int playingPosition = 0;
     private final ChangeSongListener changeSongListener;
 
     public MusicAdapter(List<MusicList> list, Context context) {
         this.list = list;
-        this.context = context;
         this.changeSongListener = ((ChangeSongListener)context);
     }
 
@@ -38,7 +36,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MusicAdapter.MyViewHolder holder, int position) {
+    public void onBindViewHolder(MusicAdapter.MyViewHolder holder, int position) {
         MusicList list2 = list.get(position);
 
         if(list2.isPlaying()) {
