@@ -51,11 +51,11 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
         holder.musicDuration.setText(list2.getDuration());
 
         holder.rootLayout.setOnClickListener(v -> {
-            list.get(playingPosition).setPlaying(false);
-            list2.setPlaying(true);
+            //list.get(playingPosition).setPlaying(false);
+            //list2.setPlaying(true);
 
             changeSongListener.onChanged(position);
-            notifyDataSetChanged();
+            //notifyDataSetChanged();
         });
     }
 

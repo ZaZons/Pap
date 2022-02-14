@@ -9,7 +9,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.ui.DefaultTimeBar;
 import com.google.android.exoplayer2.ui.StyledPlayerControlView;
+import com.google.android.exoplayer2.ui.TimeBar;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
@@ -45,20 +48,19 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     LinearLayout searchBtn;
     LinearLayout menuBtn;
 
-    private boolean isPlaying = false;
     private RecyclerView musicRecyclerView;
     private TextView endTime, startTime;
-    private SeekBar playerSeekbar;
+    private DefaultTimeBar playerSeekbar;
     private ImageView playPauseImg;
     private StyledPlayerControlView musicView;
     private int playingPosition;
     private MusicList currentMusicList;
 
     ExoPlayer player;
-    ExoPlayer.Listener playerListener;
 
     private final List<MusicList> musicLists = new ArrayList<>();
     private MusicAdapter musicAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,8 +90,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         playPauseCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isPlaying) {
-                    isPlaying = false;
+                if(player.isPlaying()) {
                     player.pause();
                     playPauseImg.setImageResource(R.drawable.ic_play_arrow);
                 } else {
@@ -117,28 +118,18 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
         player.addListener(new ExoPlayer.Listener() {
             @Override
-            public void onIsPlayingChanged(boolean isPlaying) {
-                long realDurationMillis = player.getDuration();
-            }
-
-            @Override
             public void onMediaItemTransition(MediaItem newMediaItem, @com.google.android.exoplayer2.Player.MediaItemTransitionReason int reason) {
-                //Stream<MusicList> mediaItem = musicLists.stream().filter(music -> newMediaItem.equals(music.getMediaItem()));
-                //Log.d("fds", ": " + musicLists.stream().filter(music -> newMediaItem.equals(music.getMediaItem())));
-
-                if(currentMusicList != null) {
+                if(currentMusicList != null)
                     currentMusicList.setPlaying(false);
-                }
 
                 for(MusicList m : musicLists)
                     if(m.getMediaItem().equals(newMediaItem)) currentMusicList = m;
 
-                currentMusicList.setPlaying(true);
-
-                musicAdapter.notifyDataSetChanged();
-                //Log.d("fds", ": " + newMediaItem);
+                updateUi(currentMusicList);
             }
         });
+
+        seekWithTheBar();
     }
 
     void findSongs() {
@@ -147,14 +138,14 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
             Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             String sortOrder = MediaStore.Audio.Media.DATE_ADDED + " DESC";
+            String selection = MediaStore.Audio.Media.IS_MUSIC +  " != 0";
 
             /*
             String[] selectionArgs = {"%.mp3%", "%.wav", "%.m4a"};
             String selection = MediaStore.Audio.AudioColumns.IS_MUSIC;
-            String[] projection = {MediaStore.Audio.Media.DATE_ADDED};
             */
 
-            Cursor cursor = contentResolver.query(uri, null, null, null, sortOrder);
+            Cursor cursor = contentResolver.query(uri, null, selection, null, sortOrder);
 
             if(cursor == null) {
                 Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
@@ -171,27 +162,17 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                     final String getArtistName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
                     String getDuration = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DURATION));
 
-                    long time = Long.parseLong(getDuration);
-                    long seconds = time / 1000;
-                    long minutes = seconds / 60;
-                    seconds = seconds % 60;
-
-                    String stringedMinutes = Long.toString(minutes);
-                    String stringedSeconds = Long.toString(seconds);
-
-                    if(seconds < 10) getDuration = stringedMinutes + ":0" + stringedSeconds;
-                    else getDuration = stringedMinutes + ":" + stringedSeconds;
-
-                    final MusicList musicList = new MusicList(getMusicFileName, getArtistName, getDuration, false, musicFileUri);
+                    final MusicList musicList = new MusicList(getMusicFileName, getArtistName, generateTime(getDuration), false, musicFileUri);
                     musicLists.add(musicList);
 
                     if(x == 104) break; //para remover no fim
                 } while(cursor.moveToNext());
-                Toast.makeText(this, x + " Songs found", Toast.LENGTH_SHORT).show();
-                Log.d("FindSongs", x + " Songs found");
-
                 musicAdapter = new MusicAdapter(musicLists, MainActivity.this);
                 musicRecyclerView.setAdapter(musicAdapter);
+
+                Toast.makeText(this, musicAdapter.getItemCount() + " Songs found", Toast.LENGTH_SHORT).show();
+                Log.d("FindSongs", musicAdapter.getItemCount() + " Songs found");
+
                 cursor.close();
             }
         } catch (Exception e) {
@@ -207,26 +188,73 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         playingPosition = position;
         MusicList firstItem = musicLists.get(position);
         MediaItem mediaItem = firstItem.getMediaItem();
-        //long generateDuration = player.getDuration();
-
         player.addMediaItem(mediaItem);
-        endTime.setText(firstItem.getDuration());
-        //startTime.setText((int) player.getCurrentPosition());
 
         for(int i = position + 1; i < musicAdapter.getItemCount() + 1; i++) {
             if(i == musicAdapter.getItemCount()) i = 0;
             if(i == position) break;
 
-            MusicList nextItem = musicLists.get(i);
-            MediaItem nextMediaItem = MediaItem.fromUri(nextItem.getMusicFile());
+            MediaItem nextMediaItem = musicLists.get(i).getMediaItem();
             player.addMediaItem(nextMediaItem);
         }
 
+        updateUi(firstItem);
         play();
     }
 
+    void seekWithTheBar() {
+        playerSeekbar.addListener(new TimeBar.OnScrubListener() {
+            @Override
+            public void onScrubStart(TimeBar timeBar, long position) {
+                //player.pause();
+            }
+
+            @Override
+            public void onScrubMove(TimeBar timeBar, long position) {
+                player.seekTo(position);
+            }
+
+            @Override
+            public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
+                //play();
+            }
+        });
+    }
+
+    void updateUi(MusicList currentMusicList) {
+        //playerSeekbar.setDuration(player.getDuration());
+        endTime.setText(currentMusicList.getDuration());
+        startTime.setText(generateTime(player.getCurrentPosition()));
+        currentMusicList.setPlaying(true);
+        musicAdapter.notifyDataSetChanged();
+    }
+
+    String generateTime(String duration) {
+        long time = Long.parseLong(duration);
+        long seconds = time / 1000;
+        long minutes = seconds / 60;
+        seconds = seconds % 60;
+
+        String stringedMinutes = Long.toString(minutes);
+        String stringedSeconds = Long.toString(seconds);
+
+        if(seconds < 10) return (stringedMinutes + ":0" + stringedSeconds);
+        else return (stringedMinutes + ":" + stringedSeconds);
+    }
+
+    String generateTime(long duration) {
+        long seconds = duration / 1000;
+        long minutes = seconds / 60;
+        seconds = seconds % 60;
+
+        String stringedMinutes = Long.toString(minutes);
+        String stringedSeconds = Long.toString(seconds);
+
+        if(seconds < 10) return (stringedMinutes + ":0" + stringedSeconds);
+        else return (stringedMinutes + ":" + stringedSeconds);
+    }
+
     void play() {
-        isPlaying = true;
         player.prepare();
         player.play();
         playPauseImg.setImageResource(R.drawable.btn_pause);

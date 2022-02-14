@@ -6,11 +6,6 @@
     android:orientation="horizontal"
     android:background="#191a1f">
 
-    <!--<ListView
-        android:id="@+id/listview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"/>
--->
     <RelativeLayout
         android:id="@+id/topBar"
         android:paddingBottom="12dp"
@@ -90,15 +85,13 @@
                 android:layout_marginStart="10dp"
                 android:text="00:00"/>
 
-            <SeekBar
+            <com.google.android.exoplayer2.ui.DefaultTimeBar
                 android:id="@+id/playerSeekBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@+id/endTime"
                 android:layout_toEndOf="@+id/startTime"
-                android:max="100"
-                android:progress="50"
                 android:progressDrawable="@drawable/cool_seekbar"
                 android:splitTrack="false"
                 android:thumb="@drawable/custom_thumb" />
