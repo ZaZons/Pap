@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         searchBtn = findViewById(R.id.searchBtn);
         startTime = findViewById(R.id.startTime);
         endTime = findViewById(R.id.endTime);
-        playerSeekbar = findViewById(R.id.playerSeekBar);
+        playerSeekbar = findViewById(R.id.exo_progress);
 
         musicRecyclerView.setHasFixedSize(false);
         musicRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -129,7 +129,22 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
             }
         });
 
-        seekWithTheBar();
+        playerSeekbar.addListener(new TimeBar.OnScrubListener() {
+            @Override
+            public void onScrubStart(TimeBar timeBar, long position) {
+                //player.pause();
+            }
+
+            @Override
+            public void onScrubMove(TimeBar timeBar, long position) {
+                player.seekTo(position);
+            }
+
+            @Override
+            public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
+                //play();
+            }
+        });
     }
 
     void findSongs() {
@@ -203,22 +218,6 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     }
 
     void seekWithTheBar() {
-        playerSeekbar.addListener(new TimeBar.OnScrubListener() {
-            @Override
-            public void onScrubStart(TimeBar timeBar, long position) {
-                //player.pause();
-            }
-
-            @Override
-            public void onScrubMove(TimeBar timeBar, long position) {
-                player.seekTo(position);
-            }
-
-            @Override
-            public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
-                //play();
-            }
-        });
     }
 
     void updateUi(MusicList currentMusicList) {

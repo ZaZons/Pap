@@ -63,6 +63,13 @@
         android:layout_above="@+id/controlBar"
         android:layout_below="@+id/topBar"
         android:layout_marginBottom="10dp" />
+<!--
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+    </LinearLayout>-->
 
     <LinearLayout
         android:id="@+id/controlBar"
@@ -75,38 +82,56 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/startTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="10dp"
-                android:text="00:00"/>
 
-            <com.google.android.exoplayer2.ui.DefaultTimeBar
-                android:id="@+id/playerSeekBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@+id/endTime"
-                android:layout_toEndOf="@+id/startTime"
-                android:progressDrawable="@drawable/cool_seekbar"
-                android:splitTrack="false"
-                android:thumb="@drawable/custom_thumb" />
+            <com.google.android.exoplayer2.ui.StyledPlayerControlView
+                android:id="@+id/playerView"
+                android:layout_width="0dp"
+                android:layout_height="0dp">
 
-            <TextView
-                android:id="@+id/endTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="10dp"
-                android:layout_alignParentEnd="true"
-                android:layout_marginBottom="10dp"
-                android:text="00:00"/>
+                <TextView
+                    android:id="@+id/startTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:text="00:00"/>
+
+                <com.google.android.exoplayer2.ui.DefaultTimeBar
+                    android:id="@id/exo_progress"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    app:scrubber_color="@color/blue_primary"
+                    app:played_color="@color/blue_primary"
+                    app:scrubber_drawable="@drawable/custom_thumb"
+                    app:scrubber_enabled_size="24dp"
+                    android:layout_height="26dp"/>
+
+                <!--<com.google.android.exoplayer2.ui.DefaultTimeBar
+                    android:id="@+id/exo_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@+id/endTime"
+                    android:layout_toEndOf="@+id/startTime"
+                    android:progressDrawable="@drawable/cool_seekbar"
+                    android:splitTrack="false"
+                    android:thumb="@drawable/custom_thumb"/>-->
+
+                <TextView
+                    android:id="@+id/endTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="10dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="10dp"
+                    android:text="00:00"/>
+
+            </com.google.android.exoplayer2.ui.StyledPlayerControlView>
 
         </RelativeLayout>
 
@@ -117,11 +142,6 @@
             android:orientation="horizontal"
             android:gravity="center">
 
-            <com.google.android.exoplayer2.ui.StyledPlayerControlView
-                android:id="@+id/playerView"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                />
             <ImageView
                 android:id="@+id/previousBtn"
                 android:layout_marginEnd="20dp"
