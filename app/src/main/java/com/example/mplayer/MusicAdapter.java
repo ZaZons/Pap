@@ -11,16 +11,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.exoplayer2.ui.StyledPlayerControlView;
-
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder> {
 
     private final List<MusicList> list;
-    private int playingPosition = 0;
+    //private int playingPosition = 0;
     private final ChangeSongListener changeSongListener;
 
     public MusicAdapter(List<MusicList> list, Context context) {
@@ -40,10 +36,10 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
         MusicList list2 = list.get(position);
 
         if(list2.isPlaying()) {
-            playingPosition = position;
-            holder.rootLayout.setBackgroundResource(R.drawable.back_blue_10);
+            //playingPosition = position;
+            holder.rootLayout.setBackgroundResource(R.drawable.bg_purple);
         } else {
-            holder.rootLayout.setBackgroundResource(R.drawable.back_10);
+            holder.rootLayout.setBackgroundResource(R.drawable.bg_blue);
         }
 
         holder.title.setText(list2.getTitle());

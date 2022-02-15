@@ -11,7 +11,10 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.ui.DefaultTimeBar;
+import com.google.android.exoplayer2.ui.PlayerControlView;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.ui.StyledPlayerControlView;
+import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.android.exoplayer2.ui.TimeBar;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -52,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     private TextView endTime, startTime;
     private DefaultTimeBar playerSeekbar;
     private ImageView playPauseImg;
-    private StyledPlayerControlView musicView;
+    private StyledPlayerView musicView;
     private int playingPosition;
     private MusicList currentMusicList;
 

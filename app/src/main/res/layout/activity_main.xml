@@ -18,7 +18,7 @@
             android:layout_marginTop="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/back_10">
+            android:background="@drawable/bg_blue">
 
             <ImageView
                 android:layout_margin="10dp"
@@ -45,7 +45,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
-            android:background="@drawable/back_10">
+            android:background="@drawable/bg_blue">
 
             <ImageView
                 android:layout_width="20dp"
@@ -62,7 +62,7 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/controlBar"
         android:layout_below="@+id/topBar"
-        android:layout_marginBottom="10dp" />
+        android:layout_marginBottom="10dp"/>
 <!--
     <LinearLayout
         android:layout_width="match_parent"
@@ -82,56 +82,47 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-
-            <com.google.android.exoplayer2.ui.StyledPlayerControlView
+            <com.google.android.exoplayer2.ui.StyledPlayerView
                 android:id="@+id/playerView"
-                android:layout_width="0dp"
-                android:layout_height="0dp">
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
 
-                <TextView
-                    android:id="@+id/startTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FFFFFF"
-                    android:textSize="12sp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:text="00:00"/>
+                    <TextView
+                        android:id="@+id/startTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="10dp"
+                        android:text="00:00"/>
 
-                <com.google.android.exoplayer2.ui.DefaultTimeBar
-                    android:id="@id/exo_progress"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    app:scrubber_color="@color/blue_primary"
-                    app:played_color="@color/blue_primary"
-                    app:scrubber_drawable="@drawable/custom_thumb"
-                    app:scrubber_enabled_size="24dp"
-                    android:layout_height="26dp"/>
+                    <!--<com.google.android.exoplayer2.ui.DefaultTimeBar
+                        android:id="@id/exo_progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="5dp"
+                        android:layout_marginBottom="40dp"
+                        app:layout_constraintEnd_toEndOf="@id/endTime"
+                        app:layout_constraintStart_toStartOf="@id/startTime"
+                        app:scrubber_color="@color/blue_primary"
+                        app:played_color="@color/blue_primary"
+                        app:scrubber_drawable="@drawable/custom_thumb"
+                        app:scrubber_enabled_size="24dp"/>-->
 
-                <!--<com.google.android.exoplayer2.ui.DefaultTimeBar
-                    android:id="@+id/exo_progress"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toStartOf="@+id/endTime"
-                    android:layout_toEndOf="@+id/startTime"
-                    android:progressDrawable="@drawable/cool_seekbar"
-                    android:splitTrack="false"
-                    android:thumb="@drawable/custom_thumb"/>-->
+                    <TextView
+                        android:id="@+id/endTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="10dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginBottom="10dp"
+                        android:text="00:00"/>
 
-                <TextView
-                    android:id="@+id/endTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FFFFFF"
-                    android:textSize="12sp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="10dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginBottom="10dp"
-                    android:text="00:00"/>
-
-            </com.google.android.exoplayer2.ui.StyledPlayerControlView>
+            </com.google.android.exoplayer2.ui.StyledPlayerView>
 
         </RelativeLayout>
 
@@ -148,7 +139,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/ic_skip_previous"
-                android:background="@drawable/back_10"
+                android:background="@drawable/bg_blue"
                 android:padding="10dp"/>
 
             <androidx.cardview.widget.CardView
@@ -177,7 +168,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/ic_skip_next"
-                android:background="@drawable/back_10"
+                android:background="@drawable/bg_blue"
                 android:padding="10dp"/>
 
         </LinearLayout>

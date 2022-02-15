@@ -8,10 +8,11 @@
         android:id="@+id/rootLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_marginStart="10dp"
+        android:layout_marginBottom="5dp"
         android:layout_marginEnd="10dp"
-        android:background="@drawable/back_10">
+        android:background="@drawable/bg_blue">
 
         <LinearLayout
             android:layout_toStartOf="@+id/musicDuration"
@@ -51,9 +52,8 @@
             android:paddingEnd="10dp"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
-            android:background="@drawable/back_10"
+            android:background="@drawable/bg_blue"
             android:textSize="12sp"/>
-
     </RelativeLayout>
 
 </RelativeLayout>
