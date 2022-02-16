@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     private TextView endTime, startTime;
     private DefaultTimeBar playerSeekbar;
     private ImageView playPauseImg;
-    private StyledPlayerView musicView;
+    private StyledPlayerControlView musicView;
     private int playingPosition;
     private MusicList currentMusicList;
 
@@ -69,16 +69,15 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        menuBtn = findViewById(R.id.menuBtn);
+        //menuBtn = findViewById(R.id.menuBtn);
         musicRecyclerView = findViewById(R.id.musicRecyclerView);
         nextBtn = findViewById(R.id.nextBtn);
         playPauseImg = findViewById(R.id.playPauseImg);
         previousBtn = findViewById(R.id.previousBtn);
-        playPauseCard = findViewById(R.id.playPauseCard);
-        searchBtn = findViewById(R.id.searchBtn);
-        startTime = findViewById(R.id.startTime);
-        endTime = findViewById(R.id.endTime);
-        playerSeekbar = findViewById(R.id.exo_progress);
+        //searchBtn = findViewById(R.id.searchBtn);
+        //startTime = findViewById(R.id.startTime);
+        endTime = findViewById(R.id.exo_duration);
+        //playerSeekbar = findViewById(R.id.exo_progress);
 
         musicRecyclerView.setHasFixedSize(false);
         musicRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -90,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
         requestPermission();
 
-        playPauseCard.setOnClickListener(new View.OnClickListener() {
+        playPauseImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(player.isPlaying()) {
@@ -131,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 updateUi(currentMusicList);
             }
         });
-
+/*
         playerSeekbar.addListener(new TimeBar.OnScrubListener() {
             @Override
             public void onScrubStart(TimeBar timeBar, long position) {
@@ -147,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
             public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
                 //play();
             }
-        });
+        });*/
     }
 
     void findSongs() {
@@ -226,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     void updateUi(MusicList currentMusicList) {
         //playerSeekbar.setDuration(player.getDuration());
         endTime.setText(currentMusicList.getDuration());
-        startTime.setText(generateTime(player.getCurrentPosition()));
+        //startTime.setText(generateTime(player.getCurrentPosition()));
         currentMusicList.setPlaying(true);
         musicAdapter.notifyDataSetChanged();
     }
