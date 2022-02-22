@@ -7,33 +7,34 @@
         android:id="@+id/exo_position"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-        android:textSize="12sp"
         android:layout_centerVertical="true"
+        android:layout_marginBottom="20dp"
         android:layout_marginStart="30dp"
-        android:layout_marginBottom="20dp"/>
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"/>
 
     <com.google.android.exoplayer2.ui.DefaultTimeBar
         android:id="@+id/exo_progress"
-        style="@style/Widget.AppCompat.SeekBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginEnd="70dp"
         android:layout_marginStart="70dp"
+        android:background="@android:color/transparent"
         app:bar_height="3dp"
-        app:scrubber_drawable="@drawable/custom_thumb"
         app:played_color="@color/pink_primary"
+        app:scrubber_drawable="@drawable/custom_thumb"
         app:unplayed_color="#d1d1d2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        style="@style/Widget.AppCompat.SeekBar"/>
 
     <TextView
         android:id="@+id/exo_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-        android:textSize="12sp"
         android:layout_centerVertical="true"
-        android:layout_marginEnd="30dp"
         android:layout_marginBottom="20dp"
-        android:layout_alignParentEnd="true"/>
+        android:layout_marginEnd="30dp"
+        android:layout_alignParentEnd="true"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"/>
 </RelativeLayout>

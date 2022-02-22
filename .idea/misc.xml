@@ -13,8 +13,7 @@
         <entry key="..\:/Android/Projects/app/src/main/res/drawable/ic_menu.xml" value="0.1335" />
         <entry key="..\:/Android/Projects/app/src/main/res/drawable/ic_music.xml" value="0.1335" />
         <entry key="..\:/Android/Projects/app/src/main/res/drawable/list_bg.xml" value="0.1335" />
-        <entry key="..\:/Android/Projects/app/src/main/res/layout/activity_main.xml" value="0.33" />
-        <entry key="..\:/Android/Projects/app/src/main/res/layout/exo_playback_control_view.xml" value="0.3380208333333333" />
+        <entry key="..\:/Android/Projects/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Android/Projects/app/src/main/res/layout/music_adapter_layout.xml" value="0.1" />
         <entry key="..\:/Android/Projects/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.3315" />
         <entry key="..\:/Android/Projects/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1725" />
@@ -29,6 +28,8 @@
         <entry key="..\:/fds/AndroidStudio/MPlayer/app/src/main/res/drawable/ic_search.xml" value="0.43072916666666666" />
         <entry key="..\:/fds/AndroidStudio/MPlayer/app/src/main/res/drawable/list_bg.xml" value="0.45282051282051283" />
         <entry key="..\:/fds/AndroidStudio/MPlayer/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/fds/AndroidStudio/MPlayer/app/src/main/res/layout/custom_controls.xml" value="0.38333333333333336" />
+        <entry key="..\:/fds/AndroidStudio/MPlayer/app/src/main/res/layout/exo_playback_control_view.xml" value="0.38333333333333336" />
         <entry key="..\:/fds/AndroidStudio/MPlayer/app/src/main/res/layout/list_item.xml" value="0.33" />
         <entry key="..\:/fds/AndroidStudio/MPlayer/app/src/main/res/layout/music_adapter_layout.xml" value="0.4869791666666667" />
         <entry key="..\:/fds/AndroidStudio/MPlayer/app/src/main/res/layout/row.xml" value="0.3984375" />
