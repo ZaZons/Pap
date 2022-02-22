@@ -45,18 +45,16 @@ import java.util.stream.Stream;
 
 
 public class MainActivity extends AppCompatActivity implements ChangeSongListener {
-    CardView playPauseCard;
     ImageView nextBtn;
     ImageView previousBtn;
-    LinearLayout searchBtn;
-    LinearLayout menuBtn;
+    //LinearLayout searchBtn;
+    //LinearLayout menuBtn;
 
     private RecyclerView musicRecyclerView;
-    private TextView endTime, startTime;
-    private DefaultTimeBar playerSeekbar;
+    //private TextView endTime, startTime;
+    //private DefaultTimeBar playerSeekbar;
     private ImageView playPauseImg;
     private StyledPlayerControlView musicView;
-    private int playingPosition;
     private MusicList currentMusicList;
 
     ExoPlayer player;
@@ -76,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         previousBtn = findViewById(R.id.previousBtn);
         //searchBtn = findViewById(R.id.searchBtn);
         //startTime = findViewById(R.id.startTime);
-        endTime = findViewById(R.id.exo_duration);
+        //endTime = findViewById(R.id.exo_duration);
         //playerSeekbar = findViewById(R.id.exo_progress);
 
         musicRecyclerView.setHasFixedSize(false);
@@ -112,8 +110,13 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         previousBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(player.hasPreviousMediaItem()) {
-                    player.seekToPreviousMediaItem();
+                long millisecondsToGoBack = 2000;
+                if(player.getCurrentPosition() >= millisecondsToGoBack) {
+                    player.seekTo(0);
+                } else {
+                    if(player.hasPreviousMediaItem()) {
+                        player.seekToPreviousMediaItem();
+                    }
                 }
             }
         });
@@ -182,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                     final MusicList musicList = new MusicList(getMusicFileName, getArtistName, generateTime(getDuration), false, musicFileUri);
                     musicLists.add(musicList);
 
-                    if(x == 104) break; //para remover no fim
+                    //if(x == 104) break; //para remover no fim
                 } while(cursor.moveToNext());
                 musicAdapter = new MusicAdapter(musicLists, MainActivity.this);
                 musicRecyclerView.setAdapter(musicAdapter);
@@ -202,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         player.stop();
         player.clearMediaItems();
 
-        playingPosition = position;
+        //playingPosition = position;
         MusicList firstItem = musicLists.get(position);
         MediaItem mediaItem = firstItem.getMediaItem();
         player.addMediaItem(mediaItem);
@@ -219,12 +222,9 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         play();
     }
 
-    void seekWithTheBar() {
-    }
-
     void updateUi(MusicList currentMusicList) {
         //playerSeekbar.setDuration(player.getDuration());
-        endTime.setText(currentMusicList.getDuration());
+        //endTime.setText(currentMusicList.getDuration());
         //startTime.setText(generateTime(player.getCurrentPosition()));
         currentMusicList.setPlaying(true);
         musicAdapter.notifyDataSetChanged();
