@@ -65,7 +65,7 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/controlBar"
         android:layout_below="@+id/topBar"
-        android:layout_marginBottom="10dp" />
+        android:layout_marginBottom="10dp"/>
 <!--
     <LinearLayout
         android:layout_width="match_parent"
@@ -81,13 +81,13 @@
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
 
-        <com.google.android.exoplayer2.ui.StyledPlayerControlView
-            android:id="@+id/playerView"
-            android:layout_width="match_parent"
-            android:layout_height="15dp"
-            android:layout_marginBottom="10dp"
-            app:show_timeout="0"
-            app:controller_layout_id="@layout/exo_playback_control_view"/>
+            <com.google.android.exoplayer2.ui.StyledPlayerControlView
+                android:id="@+id/playerView"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:layout_marginBottom="10dp"
+                app:show_timeout="0"
+                app:controller_layout_id="@layout/exo_playback_control_view"/>
 
         <LinearLayout
             android:layout_width="match_parent"

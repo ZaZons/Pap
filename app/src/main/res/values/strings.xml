@@ -2,6 +2,9 @@
     <string name="app_name" translatable="false">Quack Player</string>
     <string name="button_allow">Allow</string>
     <string name="button_deny">Allow</string>
+    <string name="desc_previousBtn">Button that seeks to the previous music</string>
+    <string name="desc_nextBtn">Button that seeks to the next music</string>
+    <string name="desc_playPauseBtn">Button that allows you to play/pause</string>
     <string name="permission_storage_rationale">Fds</string>
     <string name="permission_storage_denied">Permission to access storage denied</string>
     <string name="permission_storage_allow">Permission to access storage allowed</string>

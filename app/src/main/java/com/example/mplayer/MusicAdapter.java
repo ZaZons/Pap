@@ -16,7 +16,6 @@ import java.util.List;
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder> {
 
     private final List<MusicList> list;
-    //private int playingPosition = 0;
     private final ChangeSongListener changeSongListener;
 
     public MusicAdapter(List<MusicList> list, Context context) {
@@ -35,24 +34,16 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
     public void onBindViewHolder(MusicAdapter.MyViewHolder holder, int position) {
         MusicList list2 = list.get(position);
 
-        if(list2.isPlaying()) {
-            //playingPosition = position;
-            holder.rootLayout.setBackgroundResource(R.drawable.bg_purple);
-        } else {
-            holder.rootLayout.setBackgroundResource(R.drawable.bg_blue);
-        }
-
         holder.title.setText(list2.getTitle());
         holder.artist.setText(list2.getArtist());
         holder.musicDuration.setText(list2.getDuration());
 
-        holder.rootLayout.setOnClickListener(v -> {
-            //list.get(playingPosition).setPlaying(false);
-            //list2.setPlaying(true);
+        if(list2.isPlaying())
+            holder.rootLayout.setBackgroundResource(R.drawable.bg_purple);
+        else
+            holder.rootLayout.setBackgroundResource(R.drawable.bg_blue);
 
-            changeSongListener.onChanged(position);
-            //notifyDataSetChanged();
-        });
+        holder.rootLayout.setOnClickListener(v -> changeSongListener.onChanged(position));
     }
 
     @Override

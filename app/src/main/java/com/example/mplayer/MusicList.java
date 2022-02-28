@@ -8,7 +8,7 @@ public class MusicList {
 
     private boolean isPlaying;
     private final String title, artist, duration;
-    private final Uri musicFile;
+    //private final Uri musicFile;
     private final MediaItem mediaItem;
 
     public MusicList(String title, String artist, String duration, boolean isPlaying, Uri musicFile) {
@@ -16,7 +16,7 @@ public class MusicList {
         this.artist = artist;
         this.duration = duration;
         this.isPlaying = isPlaying;
-        this.musicFile = musicFile;
+        //this.musicFile = musicFile;
         this.mediaItem = MediaItem.fromUri(musicFile);
     }
 
@@ -36,9 +36,9 @@ public class MusicList {
         return isPlaying;
     }
 
-    public Uri getMusicFile() {
+    /*public Uri getMusicFile() {
         return musicFile;
-    }
+    }*/
 
     public MediaItem getMediaItem() {return mediaItem;}
 

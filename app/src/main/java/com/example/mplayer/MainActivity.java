@@ -16,6 +16,7 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.database.Cursor;
@@ -24,7 +25,6 @@ import android.os.Bundle;
 import android.Manifest;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -39,10 +39,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     //LinearLayout menuBtn;
 
     private RecyclerView musicRecyclerView;
-    //private TextView endTime, startTime;
-    //private DefaultTimeBar playerSeekbar;
     private ImageView playPauseImg;
-    private StyledPlayerControlView musicView;
     private MusicList currentMusicList;
 
     ExoPlayer player;
@@ -61,47 +58,42 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         playPauseImg = findViewById(R.id.playPauseImg);
         previousBtn = findViewById(R.id.previousBtnCard);
         //searchBtn = findViewById(R.id.searchBtn);
-        //startTime = findViewById(R.id.startTime);
-        //endTime = findViewById(R.id.exo_duration);
-        //playerSeekbar = findViewById(R.id.exo_progress);
 
         musicRecyclerView.setHasFixedSize(false);
         musicRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        musicView = findViewById(R.id.playerView);
+        StyledPlayerControlView musicView = findViewById(R.id.playerView);
         player = new ExoPlayer.Builder(this).build();
         musicView.setPlayer(player);
         player.setRepeatMode(Player.REPEAT_MODE_ALL);
 
         requestPermission();
 
-        playPauseImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(player.isPlaying()) player.pause();
-                else play();
-            }
+        playPauseImg.setOnClickListener(v -> {
+            if(player.isPlaying())
+                player.pause();
+            else
+                play();
         });
 
-        nextBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(player.hasNextMediaItem())
-                    player.seekToNextMediaItem();
-            }
+        nextBtn.setOnClickListener(v -> {
+            if(player.hasNextMediaItem())
+                player.seekToNextMediaItem();
+
+            if(!player.isPlaying())
+                play();
         });
 
-        previousBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                long millisecondsToGoBack = 2000;
-                if(player.getCurrentPosition() >= millisecondsToGoBack) {
-                    player.seekTo(0);
-                } else {
-                    if(player.hasPreviousMediaItem()) {
-                        player.seekToPreviousMediaItem();
-                    }
-                }
+        previousBtn.setOnClickListener(v -> {
+            long millisecondsToGoBack = 1000;
+            if(player.getCurrentPosition() >= millisecondsToGoBack) {
+                player.seekTo(0);
+            } else {
+                if(player.hasPreviousMediaItem())
+                    player.seekToPreviousMediaItem();
+
+                if(!player.isPlaying())
+                    play();
             }
         });
 
@@ -114,7 +106,8 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 for(MusicList m : musicLists)
                     if(m.getMediaItem().equals(newMediaItem)) currentMusicList = m;
 
-                updateUi(currentMusicList);
+                if(currentMusicList != null)
+                    updateUi(currentMusicList);
             }
 
             @Override
@@ -125,23 +118,6 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                     playPauseImg.setImageResource(R.drawable.ic_play_arrow);
             }
         });
-/*
-        playerSeekbar.addListener(new TimeBar.OnScrubListener() {
-            @Override
-            public void onScrubStart(TimeBar timeBar, long position) {
-                //player.pause();
-            }
-
-            @Override
-            public void onScrubMove(TimeBar timeBar, long position) {
-                player.seekTo(position);
-            }
-
-            @Override
-            public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
-                //play();
-            }
-        });*/
     }
 
     void findSongs() {
@@ -165,9 +141,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 Toast.makeText(this, "No music found", Toast.LENGTH_SHORT).show();
             } else {
                 cursor.moveToFirst();
-                int x = 0; //para remover no fim
                 do {
-                    x++; //para remover no fim
                     long cursorId = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
                     Uri musicFileUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cursorId);
                     final String getMusicFileName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
@@ -176,8 +150,6 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
                     final MusicList musicList = new MusicList(getMusicFileName, getArtistName, generateTime(getDuration), false, musicFileUri);
                     musicLists.add(musicList);
-
-                    //if(x == 104) break; //para remover no fim
                 } while(cursor.moveToNext());
                 musicAdapter = new MusicAdapter(musicLists, MainActivity.this);
                 musicRecyclerView.setAdapter(musicAdapter);
@@ -197,14 +169,16 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         player.stop();
         player.clearMediaItems();
 
-        //playingPosition = position;
         MusicList firstItem = musicLists.get(position);
         MediaItem mediaItem = firstItem.getMediaItem();
         player.addMediaItem(mediaItem);
 
         for(int i = position + 1; i < musicAdapter.getItemCount() + 1; i++) {
-            if(i == musicAdapter.getItemCount()) i = 0;
-            if(i == position) break;
+            if(i == musicAdapter.getItemCount())
+                i = 0;
+
+            if(i == position)
+                break;
 
             MediaItem nextMediaItem = musicLists.get(i).getMediaItem();
             player.addMediaItem(nextMediaItem);
@@ -214,10 +188,8 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         play();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     void updateUi(MusicList currentMusicList) {
-        //playerSeekbar.setDuration(player.getDuration());
-        //endTime.setText(currentMusicList.getDuration());
-        //startTime.setText(generateTime(player.getCurrentPosition()));
         currentMusicList.setPlaying(true);
         musicAdapter.notifyDataSetChanged();
     }
@@ -231,11 +203,13 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         String stringedMinutes = Long.toString(minutes);
         String stringedSeconds = Long.toString(seconds);
 
-        if(seconds < 10) return (stringedMinutes + ":0" + stringedSeconds);
-        else return (stringedMinutes + ":" + stringedSeconds);
+        if(seconds < 10)
+            return (stringedMinutes + ":0" + stringedSeconds);
+        else
+            return (stringedMinutes + ":" + stringedSeconds);
     }
 
-    String generateTime(long duration) {
+    /*String generateTime(long duration) {
         long seconds = duration / 1000;
         long minutes = seconds / 60;
         seconds = seconds % 60;
@@ -245,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
         if(seconds < 10) return (stringedMinutes + ":0" + stringedSeconds);
         else return (stringedMinutes + ":" + stringedSeconds);
-    }
+    }*/
 
     void play() {
         player.prepare();
@@ -273,6 +247,6 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                     public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
                         permissionToken.continuePermissionRequest();
                     }
-                }).check();
+                 }).check();
     }
 }
