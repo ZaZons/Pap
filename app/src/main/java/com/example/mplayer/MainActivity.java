@@ -1,6 +1,5 @@
 package com.example.mplayer;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -9,13 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.ui.DefaultTimeBar;
-import com.google.android.exoplayer2.ui.PlayerControlView;
-import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.ui.StyledPlayerControlView;
-import com.google.android.exoplayer2.ui.StyledPlayerView;
-import com.google.android.exoplayer2.ui.TimeBar;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
@@ -33,20 +26,15 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 
 public class MainActivity extends AppCompatActivity implements ChangeSongListener {
-    ImageView nextBtn;
-    ImageView previousBtn;
+    CardView nextBtn;
+    CardView previousBtn;
     //LinearLayout searchBtn;
     //LinearLayout menuBtn;
 
@@ -69,9 +57,9 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
         //menuBtn = findViewById(R.id.menuBtn);
         musicRecyclerView = findViewById(R.id.musicRecyclerView);
-        nextBtn = findViewById(R.id.nextBtn);
+        nextBtn = findViewById(R.id.nextBtnCard);
         playPauseImg = findViewById(R.id.playPauseImg);
-        previousBtn = findViewById(R.id.previousBtn);
+        previousBtn = findViewById(R.id.previousBtnCard);
         //searchBtn = findViewById(R.id.searchBtn);
         //startTime = findViewById(R.id.startTime);
         //endTime = findViewById(R.id.exo_duration);
@@ -90,12 +78,8 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         playPauseImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(player.isPlaying()) {
-                    player.pause();
-                    playPauseImg.setImageResource(R.drawable.ic_play_arrow);
-                } else {
-                    play();
-                }
+                if(player.isPlaying()) player.pause();
+                else play();
             }
         });
 
@@ -131,6 +115,14 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                     if(m.getMediaItem().equals(newMediaItem)) currentMusicList = m;
 
                 updateUi(currentMusicList);
+            }
+
+            @Override
+            public void onIsPlayingChanged(boolean isPlaying) {
+                if(isPlaying)
+                    playPauseImg.setImageResource(R.drawable.ic_pause);
+                else
+                    playPauseImg.setImageResource(R.drawable.ic_play_arrow);
             }
         });
 /*
@@ -258,7 +250,6 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     void play() {
         player.prepare();
         player.play();
-        playPauseImg.setImageResource(R.drawable.btn_pause);
     }
 
     void requestPermission() {
