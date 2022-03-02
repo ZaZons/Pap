@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 if(!player.isPlaying())
                     play();
             }
+
         });
 
         player.addListener(new ExoPlayer.Listener() {

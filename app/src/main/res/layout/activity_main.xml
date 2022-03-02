@@ -66,13 +66,6 @@
         android:layout_above="@+id/controlBar"
         android:layout_below="@+id/topBar"
         android:layout_marginBottom="10dp"/>
-<!--
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
-
-    </LinearLayout>-->
 
     <LinearLayout
         android:id="@+id/controlBar"
