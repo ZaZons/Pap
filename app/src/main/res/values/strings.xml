@@ -9,4 +9,5 @@
     <string name="permission_storage_denied">Permission to access storage denied</string>
     <string name="permission_storage_allow">Permission to access storage allowed</string>
     <string name="permission_storage_neverask">Permission to access storage denied and we won\'t ask again</string>
+    <string name="skip">Skip</string>
 </resources>

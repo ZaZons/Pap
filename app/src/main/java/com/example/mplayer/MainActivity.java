@@ -1,6 +1,7 @@
 package com.example.mplayer;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,8 +33,8 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements ChangeSongListener {
-    ImageView nextBtn;
-    ImageView previousBtn;
+    CardView nextBtn;
+    CardView previousBtn;
     //LinearLayout searchBtn;
     //LinearLayout menuBtn;
 
@@ -53,9 +54,9 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
         //menuBtn = findViewById(R.id.menuBtn);
         musicRecyclerView = findViewById(R.id.musicRecyclerView);
-        nextBtn = findViewById(R.id.nextBtn);
+        nextBtn = findViewById(R.id.nextBtnCard);
         playPauseImg = findViewById(R.id.playPauseImg);
-        previousBtn = findViewById(R.id.previousBtn);
+        previousBtn = findViewById(R.id.previousBtnCard);
         //searchBtn = findViewById(R.id.searchBtn);
 
         musicRecyclerView.setHasFixedSize(false);
@@ -69,12 +70,10 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         requestPermission();
 
         playPauseImg.setOnClickListener(v -> {
-            if(player.isPlaying()) {
+            if(player.isPlaying())
                 player.pause();
-                playPauseImg.setImageResource(R.drawable.ic_play_arrow);
-            } else {
+            else
                 play();
-            }
         });
 
         nextBtn.setOnClickListener(v -> {
@@ -96,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 if(!player.isPlaying())
                     play();
             }
+
         });
 
         player.addListener(new ExoPlayer.Listener() {
@@ -109,6 +109,14 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
                 if(currentMusicList != null)
                     updateUi(currentMusicList);
+            }
+
+            @Override
+            public void onIsPlayingChanged(boolean isPlaying) {
+                if(isPlaying)
+                    playPauseImg.setImageResource(R.drawable.ic_pause);
+                else
+                    playPauseImg.setImageResource(R.drawable.ic_play_arrow);
             }
         });
     }
@@ -167,8 +175,11 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         player.addMediaItem(mediaItem);
 
         for(int i = position + 1; i < musicAdapter.getItemCount() + 1; i++) {
-            if(i == musicAdapter.getItemCount()) i = 0;
-            if(i == position) break;
+            if(i == musicAdapter.getItemCount())
+                i = 0;
+
+            if(i == position)
+                break;
 
             MediaItem nextMediaItem = musicLists.get(i).getMediaItem();
             player.addMediaItem(nextMediaItem);
@@ -214,7 +225,6 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     void play() {
         player.prepare();
         player.play();
-        playPauseImg.setImageResource(R.drawable.btn_pause);
     }
 
     void requestPermission() {
