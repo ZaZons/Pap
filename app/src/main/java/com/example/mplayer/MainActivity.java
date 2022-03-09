@@ -2,6 +2,7 @@ package com.example.mplayer;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,12 +20,14 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.Manifest;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -33,19 +36,15 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements ChangeSongListener {
-    CardView nextBtn;
-    CardView previousBtn;
     //LinearLayout searchBtn;
     //LinearLayout menuBtn;
 
-    private RecyclerView musicRecyclerView;
-    private ImageView playPauseImg;
-    private MusicList currentMusicList;
+    static ExoPlayer player;
 
-    ExoPlayer player;
+    final List<MusicList> musicLists = new ArrayList<>();
 
-    private final List<MusicList> musicLists = new ArrayList<>();
-    private MusicAdapter musicAdapter;
+    MusicList currentMusicList;
+    MusicAdapter musicAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,30 +52,51 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         setContentView(R.layout.activity_main);
 
         //menuBtn = findViewById(R.id.menuBtn);
-        musicRecyclerView = findViewById(R.id.musicRecyclerView);
-        nextBtn = findViewById(R.id.nextBtnCard);
-        playPauseImg = findViewById(R.id.playPauseImg);
-        previousBtn = findViewById(R.id.previousBtnCard);
+        CardView loopBtnCard = findViewById(R.id.loopBtnCard);
+        CardView nextBtnCard = findViewById(R.id.nextBtnCard);
+        CardView playPauseCard = findViewById(R.id.playPauseCard);
+        CardView previousBtnCard = findViewById(R.id.previousBtnCard);
+        CardView repeatOneIndicator = findViewById(R.id.repeatOneIndicator);
+        CardView shuffleBtnCard = findViewById(R.id.shuffleBtnCard);
+        ImageView playPauseImg = findViewById(R.id.playPauseImg);
+        RecyclerView musicRecyclerView = findViewById(R.id.musicRecyclerView);
+        StyledPlayerControlView musicView = findViewById(R.id.playerView);
         //searchBtn = findViewById(R.id.searchBtn);
+        int blue_primary = ContextCompat.getColor(getApplicationContext(), R.color.blue_primary);
+        int pink_primary = ContextCompat.getColor(getApplicationContext(), R.color.pink_primary);
 
+        //configure recyclerview e pedir perm para aceder ao storage
         musicRecyclerView.setHasFixedSize(false);
         musicRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        requestPermission(musicRecyclerView);
 
-        StyledPlayerControlView musicView = findViewById(R.id.playerView);
+        //initialize the player
         player = new ExoPlayer.Builder(this).build();
         musicView.setPlayer(player);
-        player.setRepeatMode(Player.REPEAT_MODE_ALL);
 
-        requestPermission();
+        //controls
 
-        playPauseImg.setOnClickListener(v -> {
-            if(player.isPlaying())
-                player.pause();
-            else
-                play();
+        //alternar entre os diferentes tipos de loop (um, todos ou nenhum)
+        loopBtnCard.setOnClickListener(v -> {
+            int repeatMode = player.getRepeatMode();
+
+            switch(repeatMode) {
+                case Player.REPEAT_MODE_OFF:
+                    player.setRepeatMode(Player.REPEAT_MODE_ALL);
+                    break;
+
+                case Player.REPEAT_MODE_ONE:
+                    player.setRepeatMode(Player.REPEAT_MODE_OFF);
+                    break;
+
+                case Player.REPEAT_MODE_ALL:
+                    player.setRepeatMode(Player.REPEAT_MODE_ONE);
+                    break;
+            }
         });
 
-        nextBtn.setOnClickListener(v -> {
+        //skip to next music
+        nextBtnCard.setOnClickListener(v -> {
             if(player.hasNextMediaItem())
                 player.seekToNextMediaItem();
 
@@ -84,33 +104,49 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 play();
         });
 
-        previousBtn.setOnClickListener(v -> {
+        //play or pause
+        playPauseCard.setOnClickListener(v -> {
+            if(player.isPlaying())
+                player.pause();
+            else
+                play();
+        });
+
+        //go to the previous music
+        previousBtnCard.setOnClickListener(v -> {
             long millisecondsToGoBack = 1000;
             if(player.getCurrentPosition() >= millisecondsToGoBack) {
                 player.seekTo(0);
             } else {
                 if(player.hasPreviousMediaItem())
                     player.seekToPreviousMediaItem();
-
-                if(!player.isPlaying())
-                    play();
             }
-
         });
 
+        shuffleBtnCard.setOnClickListener(v ->
+            player.setShuffleModeEnabled(!player.getShuffleModeEnabled())
+        );
+
         player.addListener(new ExoPlayer.Listener() {
+            //atualizacao da UI quando troca de mediItem
             @Override
             public void onMediaItemTransition(MediaItem newMediaItem, @com.google.android.exoplayer2.Player.MediaItemTransitionReason int reason) {
                 if(currentMusicList != null)
                     currentMusicList.setPlaying(false);
 
-                for(MusicList m : musicLists)
-                    if(m.getMediaItem().equals(newMediaItem)) currentMusicList = m;
+                for(MusicList m : musicLists) {
+                    if(m.getMediaItem() == newMediaItem)
+                        currentMusicList = m;
+                }
 
                 if(currentMusicList != null)
                     updateUi(currentMusicList);
+
+                if(!player.isPlaying())
+                    play();
             }
 
+            //mudar a imagem do botao de play
             @Override
             public void onIsPlayingChanged(boolean isPlaying) {
                 if(isPlaying)
@@ -118,16 +154,58 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 else
                     playPauseImg.setImageResource(R.drawable.ic_play_arrow);
             }
+
+            //atualizar o botao de loop
+            @Override
+            public void onRepeatModeChanged(int repeatMode) {
+                int visibility = repeatOneIndicator.getVisibility();
+                ColorStateList cardColor = loopBtnCard.getCardBackgroundColor();
+
+                switch(repeatMode) {
+                    case Player.REPEAT_MODE_OFF:
+                        if(visibility == View.VISIBLE)
+                            repeatOneIndicator.setVisibility(View.INVISIBLE);
+
+                        if(cardColor.getDefaultColor() == pink_primary)
+                            loopBtnCard.setCardBackgroundColor(blue_primary);
+                        break;
+
+                    case Player.REPEAT_MODE_ONE:
+                        if(visibility == View.INVISIBLE)
+                            repeatOneIndicator.setVisibility(View.VISIBLE);
+
+                        if(cardColor.getDefaultColor() == blue_primary)
+                            loopBtnCard.setCardBackgroundColor(pink_primary);
+                        break;
+
+                    case Player.REPEAT_MODE_ALL:
+                        if(visibility == View.VISIBLE)
+                            repeatOneIndicator.setVisibility(View.INVISIBLE);
+
+                        if(cardColor.getDefaultColor() == blue_primary)
+                            loopBtnCard.setCardBackgroundColor(pink_primary);
+                        break;
+                }
+            }
+
+            @Override
+            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+                if(shuffleModeEnabled)
+                    shuffleBtnCard.setCardBackgroundColor(pink_primary);
+                else
+                    shuffleBtnCard.setCardBackgroundColor(blue_primary);
+            }
         });
     }
 
-    void findSongs() {
+    void findSongs(RecyclerView recyclerView) {
         try {
+            //usar a media store para encontrar os ficheiros
             ContentResolver contentResolver = getApplicationContext().getContentResolver();
 
             Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-            String sortOrder = MediaStore.Audio.Media.DATE_ADDED + " DESC";
             String selection = MediaStore.Audio.Media.IS_MUSIC +  " != 0";
+            String sortOrder = MediaStore.Audio.Media.DATE_ADDED + " DESC";
 
             /*
             String[] selectionArgs = {"%.mp3%", "%.wav", "%.m4a"};
@@ -144,16 +222,24 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 cursor.moveToFirst();
                 do {
                     long cursorId = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
-                    Uri musicFileUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cursorId);
-                    final String getMusicFileName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
-                    final String getArtistName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
-                    String getDuration = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DURATION));
 
-                    final MusicList musicList = new MusicList(getMusicFileName, getArtistName, generateTime(getDuration), false, musicFileUri);
+                    //get propriedades das musicas para adicionar a lista
+                    String getArtistName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
+                    String getDuration = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DURATION));
+                    String getMusicFileName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
+
+                    Uri getMusicFileUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cursorId);
+
+                    //construir um objeto de cada musica com as propriedades adquiridas provisoriamente
+                    final MusicList musicList = new MusicList(getMusicFileName, getArtistName, generateTime(getDuration), false, getMusicFileUri);
+
+                    //adicionar o objeto a lista
                     musicLists.add(musicList);
                 } while(cursor.moveToNext());
+
+                //criar e adicionar o adaptador ao recyclerView
                 musicAdapter = new MusicAdapter(musicLists, MainActivity.this);
-                musicRecyclerView.setAdapter(musicAdapter);
+                recyclerView.setAdapter(musicAdapter);
 
                 Toast.makeText(this, musicAdapter.getItemCount() + " Songs found", Toast.LENGTH_SHORT).show();
                 Log.d("FindSongs", musicAdapter.getItemCount() + " Songs found");
@@ -165,15 +251,25 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         }
     }
 
+    //evento de quando o utilizador seleciona uma musica do recycler view
     @Override
     public void onChanged(int position) {
+        //get o mediaItem do objeto selecionado
+        MusicList firstItem = musicLists.get(position);
+        MediaItem mediaItem = firstItem.getMediaItem();
+
+        //se o media item q selecionar ja tiver a dar ent ele retorna
+        if(player.getCurrentMediaItem() == mediaItem)
+            return;
+
+        //resetar o player
         player.stop();
         player.clearMediaItems();
 
-        MusicList firstItem = musicLists.get(position);
-        MediaItem mediaItem = firstItem.getMediaItem();
         player.addMediaItem(mediaItem);
 
+        //por os itens todos da lista em queue
+        //quando chega ao ultimo volta para o primeiro, e quando chega ao selecionado baza do loop
         for(int i = position + 1; i < musicAdapter.getItemCount() + 1; i++) {
             if(i == musicAdapter.getItemCount())
                 i = 0;
@@ -195,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         musicAdapter.notifyDataSetChanged();
     }
 
+    //transformar os ms em minutos e segundos
     String generateTime(String duration) {
         long time = Long.parseLong(duration);
         long seconds = time / 1000;
@@ -222,32 +319,33 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         else return (stringedMinutes + ":" + stringedSeconds);
     }*/
 
-    void play() {
+    static void play() {
         player.prepare();
         player.play();
     }
 
-    void requestPermission() {
+    //perms handled by Dexter
+    void requestPermission(RecyclerView musicRecyclerView) {
         Dexter.withContext(this)
                 .withPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                 .withListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-                        findSongs();
+                        findSongs(musicRecyclerView);
                     }
 
                     @Override
                     public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
                         Toast.makeText(getApplicationContext(), "We need storage access to get your music", Toast.LENGTH_SHORT).show();
-                        if (permissionDeniedResponse.isPermanentlyDenied()) {
+
+                        if (permissionDeniedResponse.isPermanentlyDenied())
                             Toast.makeText(getApplicationContext(), "If you don't allow storage access we can't get your music", Toast.LENGTH_SHORT).show();
-                        }
                     }
 
                     @Override
                     public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
                         permissionToken.continuePermissionRequest();
                     }
-                 }).check();
+                }).check();
     }
 }

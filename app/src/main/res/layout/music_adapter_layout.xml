@@ -19,6 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="10dp"
             android:gravity="center_vertical"
@@ -30,14 +31,16 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:text="musicTitle"/>
 
             <TextView
                 android:id="@+id/musicArtist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
-                android:textColor="#CCFFFFFF"/>
+                android:textColor="#CCFFFFFF"
+                android:text="musicArtist"/>
         </LinearLayout>
 
         <TextView
@@ -46,14 +49,25 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="40dp"
             android:background="@drawable/bg_blue"
-            android:paddingBottom="5dp"
-            android:paddingEnd="10dp"
             android:paddingStart="10dp"
             android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:text="00:00"
             android:textColor="@color/white"
-            android:textSize="12sp"/>
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/contextMenu"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/ic_context_menu"/>
     </RelativeLayout>
 
 </RelativeLayout>
