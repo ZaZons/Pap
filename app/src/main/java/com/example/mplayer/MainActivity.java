@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         RecyclerView musicRecyclerView = findViewById(R.id.musicRecyclerView);
         StyledPlayerControlView musicView = findViewById(R.id.playerView);
         //searchBtn = findViewById(R.id.searchBtn);
+        int blue_primary = ContextCompat.getColor(getApplicationContext(), R.color.blue_primary);
+        int pink_primary = ContextCompat.getColor(getApplicationContext(), R.color.pink_primary);
 
         //configure recyclerview e pedir perm para aceder ao storage
         musicRecyclerView.setHasFixedSize(false);
@@ -121,6 +123,10 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
             }
         });
 
+        shuffleBtnCard.setOnClickListener(v ->
+            player.setShuffleModeEnabled(!player.getShuffleModeEnabled())
+        );
+
         player.addListener(new ExoPlayer.Listener() {
             //atualizacao da UI quando troca de mediItem
             @Override
@@ -155,39 +161,39 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 int visibility = repeatOneIndicator.getVisibility();
                 ColorStateList cardColor = loopBtnCard.getCardBackgroundColor();
 
-                int loopingColor = ContextCompat.getColor(getApplicationContext(), R.color.pink_primary);
-                int notLoopingColor = ContextCompat.getColor(getApplicationContext(), R.color.blue_primary);
-
                 switch(repeatMode) {
                     case Player.REPEAT_MODE_OFF:
                         if(visibility == View.VISIBLE)
                             repeatOneIndicator.setVisibility(View.INVISIBLE);
 
-                        if(cardColor.getDefaultColor() == loopingColor)
-                            loopBtnCard.setCardBackgroundColor(notLoopingColor);
+                        if(cardColor.getDefaultColor() == pink_primary)
+                            loopBtnCard.setCardBackgroundColor(blue_primary);
                         break;
 
                     case Player.REPEAT_MODE_ONE:
                         if(visibility == View.INVISIBLE)
                             repeatOneIndicator.setVisibility(View.VISIBLE);
 
-                        if(cardColor.getDefaultColor() == notLoopingColor)
-                            loopBtnCard.setCardBackgroundColor(loopingColor);
+                        if(cardColor.getDefaultColor() == blue_primary)
+                            loopBtnCard.setCardBackgroundColor(pink_primary);
                         break;
 
                     case Player.REPEAT_MODE_ALL:
                         if(visibility == View.VISIBLE)
                             repeatOneIndicator.setVisibility(View.INVISIBLE);
 
-                        if(cardColor.getDefaultColor() == notLoopingColor)
-                            loopBtnCard.setCardBackgroundColor(loopingColor);
+                        if(cardColor.getDefaultColor() == blue_primary)
+                            loopBtnCard.setCardBackgroundColor(pink_primary);
                         break;
                 }
             }
 
             @Override
             public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-
+                if(shuffleModeEnabled)
+                    shuffleBtnCard.setCardBackgroundColor(pink_primary);
+                else
+                    shuffleBtnCard.setCardBackgroundColor(blue_primary);
             }
         });
     }
