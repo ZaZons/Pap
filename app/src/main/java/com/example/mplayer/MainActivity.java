@@ -39,6 +39,18 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     //LinearLayout searchBtn;
     //LinearLayout menuBtn;
 
+    CardView loopBtnCard;
+    CardView nextBtnCard;
+    CardView playPauseCard;
+    CardView previousBtnCard;
+    CardView repeatOneIndicator;
+    CardView shuffleBtnCard;
+    ImageView playPauseImg;
+    RecyclerView musicRecyclerView;
+
+    int blue_primary;
+    int pink_primary;
+
     static ExoPlayer player;
 
     final List<MusicList> musicLists = new ArrayList<>();
@@ -52,30 +64,36 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         setContentView(R.layout.activity_main);
 
         //menuBtn = findViewById(R.id.menuBtn);
-        CardView loopBtnCard = findViewById(R.id.loopBtnCard);
-        CardView nextBtnCard = findViewById(R.id.nextBtnCard);
-        CardView playPauseCard = findViewById(R.id.playPauseCard);
-        CardView previousBtnCard = findViewById(R.id.previousBtnCard);
-        CardView repeatOneIndicator = findViewById(R.id.repeatOneIndicator);
-        CardView shuffleBtnCard = findViewById(R.id.shuffleBtnCard);
-        ImageView playPauseImg = findViewById(R.id.playPauseImg);
-        RecyclerView musicRecyclerView = findViewById(R.id.musicRecyclerView);
+        loopBtnCard = findViewById(R.id.loopBtnCard);
+        nextBtnCard = findViewById(R.id.nextBtnCard);
+        playPauseCard = findViewById(R.id.playPauseCard);
+        previousBtnCard = findViewById(R.id.previousBtnCard);
+        repeatOneIndicator = findViewById(R.id.repeatOneIndicator);
+        shuffleBtnCard = findViewById(R.id.shuffleBtnCard);
+        playPauseImg = findViewById(R.id.playPauseImg);
+        musicRecyclerView = findViewById(R.id.musicRecyclerView);
         StyledPlayerControlView musicView = findViewById(R.id.playerView);
         //searchBtn = findViewById(R.id.searchBtn);
-        int blue_primary = ContextCompat.getColor(getApplicationContext(), R.color.blue_primary);
-        int pink_primary = ContextCompat.getColor(getApplicationContext(), R.color.pink_primary);
+        blue_primary = ContextCompat.getColor(getApplicationContext(), R.color.blue_primary);
+        pink_primary = ContextCompat.getColor(getApplicationContext(), R.color.pink_primary);
 
-        //configure recyclerview e pedir perm para aceder ao storage
+        //configurar recyclerview e pedir perm para aceder ao storage
         musicRecyclerView.setHasFixedSize(false);
         musicRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        requestPermission(musicRecyclerView);
+        requestPermission();
 
         //initialize the player
         player = new ExoPlayer.Builder(this).build();
         musicView.setPlayer(player);
 
         //controls
+        controls();
 
+        //listener
+        listener();
+    }
+
+    void controls() {
         //alternar entre os diferentes tipos de loop (um, todos ou nenhum)
         loopBtnCard.setOnClickListener(v -> {
             int repeatMode = player.getRepeatMode();
@@ -123,12 +141,15 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
             }
         });
 
+        //shuffle the queue
         shuffleBtnCard.setOnClickListener(v ->
-            player.setShuffleModeEnabled(!player.getShuffleModeEnabled())
+                player.setShuffleModeEnabled(!player.getShuffleModeEnabled())
         );
+    }
 
+    void listener() {
         player.addListener(new ExoPlayer.Listener() {
-            //atualizacao da UI quando troca de mediItem
+            //atualizacao da UI quando troca de mediaItem
             @Override
             public void onMediaItemTransition(MediaItem newMediaItem, @com.google.android.exoplayer2.Player.MediaItemTransitionReason int reason) {
                 if(currentMusicList != null)
@@ -188,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 }
             }
 
+            //atualizar o botao de shuffle
             @Override
             public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
                 if(shuffleModeEnabled)
@@ -198,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         });
     }
 
-    void findSongs(RecyclerView recyclerView) {
+    void findSongs() {
         try {
             //usar a media store para encontrar os ficheiros
             ContentResolver contentResolver = getApplicationContext().getContentResolver();
@@ -239,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
                 //criar e adicionar o adaptador ao recyclerView
                 musicAdapter = new MusicAdapter(musicLists, MainActivity.this);
-                recyclerView.setAdapter(musicAdapter);
+                musicRecyclerView.setAdapter(musicAdapter);
 
                 Toast.makeText(this, musicAdapter.getItemCount() + " Songs found", Toast.LENGTH_SHORT).show();
                 Log.d("FindSongs", musicAdapter.getItemCount() + " Songs found");
@@ -247,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 cursor.close();
             }
         } catch (Exception e) {
-            Log.e("FindSongs error", "Error: " + e.getMessage());
+            Log.d("FindSongs", "Error: " + e.getMessage());
         }
     }
 
@@ -325,13 +347,13 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     }
 
     //perms handled by Dexter
-    void requestPermission(RecyclerView musicRecyclerView) {
+    void requestPermission() {
         Dexter.withContext(this)
                 .withPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                 .withListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-                        findSongs(musicRecyclerView);
+                        findSongs();
                     }
 
                     @Override
