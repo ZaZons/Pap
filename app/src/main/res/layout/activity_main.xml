@@ -6,6 +6,7 @@
     android:orientation="horizontal"
     android:background="#191a1f">
 
+    <!--Top bar-->
     <RelativeLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"

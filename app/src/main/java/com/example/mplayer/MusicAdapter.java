@@ -54,13 +54,13 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
         return list.size();
     }
 
-    static class MyViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+    static class MyViewHolder extends RecyclerView.ViewHolder {
 
         private final RelativeLayout rootLayout;
         private final TextView title;
         private final TextView artist;
         private final TextView musicDuration;
-        private final ImageView contextMenu;
+        //private final ImageView contextMenu;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -69,19 +69,19 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
             title = itemView.findViewById(R.id.musicTitle);
             artist = itemView.findViewById(R.id.musicArtist);
             musicDuration = itemView.findViewById(R.id.musicDuration);
-            contextMenu = itemView.findViewById(R.id.contextMenu);
+            /*contextMenu = itemView.findViewById(R.id.contextMenu);
             contextMenu.setOnClickListener(v -> {
                 contextMenu.setOnCreateContextMenuListener(this);
-            });
+            });*/
         }
-
+        /*
         @Override
         public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
             contextMenu.add(this.getAbsoluteAdapterPosition(), Menu.NONE, 0, "Play now");
             contextMenu.add(this.getAbsoluteAdapterPosition(), Menu.NONE, 0, "Play next");
-        }
+        }*/
     }
-
+    /*
     public static class ViewHolder extends RecyclerView.ViewHolder
             implements View.OnCreateContextMenuListener {
 
@@ -101,5 +101,5 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
             contextMenu.add(0, view.getId(), 0, "Call");//groupId, itemId, order, title
             contextMenu.add(0, view.getId(), 0, "SMS");
         }
-    }
+    }*/
 }
