@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Quack Player</string>
+    <string name="app_name" translatable="false">MPlayer</string>
     <string name="button_allow">Allow</string>
     <string name="button_deny">Allow</string>
     <string name="desc_previousBtn">Button that seeks to the previous music</string>
