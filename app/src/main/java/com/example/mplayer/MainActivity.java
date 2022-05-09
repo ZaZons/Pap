@@ -64,10 +64,10 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         setContentView(R.layout.activity_main);
 
         //menuBtn = findViewById(R.id.menuBtn);
-        loopBtnCard = findViewById(R.id.loopBtnCard);
-        nextBtnCard = findViewById(R.id.nextBtnCard);
-        playPauseCard = findViewById(R.id.playPauseCard);
-        previousBtnCard = findViewById(R.id.previousBtnCard);
+        loopBtnCard = findViewById(R.id.loopBtn);
+        nextBtnCard = findViewById(R.id.nextBtn);
+        playPauseCard = findViewById(R.id.playPauseBtn);
+        previousBtnCard = findViewById(R.id.previousBtn);
         repeatOneIndicator = findViewById(R.id.repeatOneIndicator);
         shuffleBtnCard = findViewById(R.id.shuffleBtnCard);
         playPauseImg = findViewById(R.id.playPauseImg);
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                     play();
             }
 
-            //mudar a imagem do botao de play
+            //Alterar a imagem do botao de play consoante o estado da repordução
             @Override
             public void onIsPlayingChanged(boolean isPlaying) {
                 if(isPlaying)

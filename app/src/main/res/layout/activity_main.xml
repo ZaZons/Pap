@@ -100,7 +100,7 @@
                     android:layout_height="match_parent">
 
                     <androidx.cardview.widget.CardView
-                        android:id="@+id/loopBtnCard"
+                        android:id="@+id/loopBtn"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_gravity="center"
@@ -141,7 +141,7 @@
             </RelativeLayout>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/previousBtnCard"
+                android:id="@+id/previousBtn"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginEnd="20dp"
@@ -149,7 +149,6 @@
                 app:cardCornerRadius="15dp">
 
                 <ImageView
-                    android:id="@+id/previousBtn"
                     android:layout_width="55dp"
                     android:layout_height="55dp"
                     android:layout_gravity="center"
@@ -158,7 +157,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/playPauseCard"
+                android:id="@+id/playPauseBtn"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 app:cardBackgroundColor="@color/blue_primary"
@@ -175,7 +174,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/nextBtnCard"
+                android:id="@+id/nextBtn"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginStart="20dp"
@@ -183,7 +182,6 @@
                 app:cardCornerRadius="15dp">
 
                 <ImageView
-                    android:id="@+id/nextBtn"
                     android:layout_width="55dp"
                     android:layout_height="55dp"
                     android:layout_gravity="center"
