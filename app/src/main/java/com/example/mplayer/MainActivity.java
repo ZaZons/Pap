@@ -94,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         listener();
     }
 
+
+
     void controls() {
         //alternar entre os diferentes tipos de loop (um, todos ou nenhum)
         loopBtnCard.setOnClickListener(v -> {
