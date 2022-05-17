@@ -1,15 +1,18 @@
 package com.example.mplayer;
 
+import static androidx.core.app.NotificationCompat.PRIORITY_HIGH;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.work.WorkManager;
 
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.ui.PlayerNotificationManager;
 import com.google.android.exoplayer2.ui.StyledPlayerControlView;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -19,8 +22,12 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.net.Uri;
@@ -54,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
     static ExoPlayer player;
 
-    final List<MusicList> musicLists = new ArrayList<>();
+    public static final List<MusicList> musicLists = new ArrayList<>();
 
     MusicList currentMusicList;
     MusicAdapter musicAdapter;
@@ -92,9 +99,51 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
         //listener
         listener();
+
+        //notification();
+        player.setForegroundMode(true);
+
+        //Context context = getApplicationContext();
+        //Intent intent = new Intent(this, QuackService.class);
+        //context.startForegroundService(intent);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        player.stop();
+        player.setForegroundMode(false);
+        player = null;
+    }
 
+    void notification() {
+        CharSequence name = "0";
+        String channelId = "playback_channel";
+        String description = "Playback notifications";
+        int importance = NotificationManager.IMPORTANCE_LOW;
+
+        NotificationChannel channel = new NotificationChannel(channelId, name, importance);
+        channel.setDescription(description);
+
+        NotificationManager notificationChannelManager = getSystemService(NotificationManager.class);
+        notificationChannelManager.createNotificationChannel(channel);
+
+        DescriptionAdapter descriptionAdapter = new DescriptionAdapter();
+
+        PlayerNotificationManager playerNotificationManager =
+                new PlayerNotificationManager.Builder(getApplicationContext(), 1, channelId)
+                        .setMediaDescriptionAdapter(descriptionAdapter)
+                        .build();
+
+        playerNotificationManager.setUseFastForwardAction(false);
+        playerNotificationManager.setUsePreviousAction(true);
+        playerNotificationManager.setUseNextAction(true);
+        playerNotificationManager.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        playerNotificationManager.setUseRewindAction(false);
+        playerNotificationManager.setPriority(PRIORITY_HIGH);
+        playerNotificationManager.setSmallIcon(R.mipmap.ic_launcher_foreground);
+        playerNotificationManager.setPlayer(player);
+    }
 
     void controls() {
         //alternar entre os diferentes tipos de loop (um, todos ou nenhum)
@@ -285,6 +334,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
         //se o media item q selecionar ja tiver a dar ent ele retorna
         if(player.getCurrentMediaItem() == mediaItem)
+
             return;
 
         //resetar o player
@@ -347,6 +397,10 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     static void play() {
         player.prepare();
         player.play();
+    }
+
+    public static ExoPlayer getPlayer() {
+        return player;
     }
 
     //perms handled by Dexter
