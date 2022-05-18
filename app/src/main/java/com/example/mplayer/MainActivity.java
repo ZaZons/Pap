@@ -61,10 +61,12 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
     static ExoPlayer player;
 
-    public static final List<MusicList> musicLists = new ArrayList<>();
+    static final List<MusicList> musicLists = new ArrayList<>();
 
     MusicList currentMusicList;
     MusicAdapter musicAdapter;
+
+    PlayerNotificationManager playerNotificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,13 +116,16 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         player.stop();
         player.setForegroundMode(false);
         player = null;
+
     }
+
+
 
     void notification() {
         CharSequence name = "Playback";
         String channelId = "playback_channel";
         String description = "Playback notifications";
-        int importance = NotificationManager.IMPORTANCE_LOW;
+        int importance = NotificationManager.IMPORTANCE_HIGH;
 
         NotificationChannel channel = new NotificationChannel(channelId, name, importance);
         channel.setDescription(description);
@@ -130,18 +135,22 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
         DescriptionAdapter descriptionAdapter = new DescriptionAdapter();
 
-        PlayerNotificationManager playerNotificationManager =
+        playerNotificationManager =
                 new PlayerNotificationManager.Builder(getApplicationContext(), 1, channelId)
                         .setMediaDescriptionAdapter(descriptionAdapter)
+                        .setNextActionIconResourceId(R.drawable.ic_skip_next)
+                        .setPauseActionIconResourceId(R.drawable.ic_pause)
+                        .setPreviousActionIconResourceId(R.drawable.ic_skip_previous)
+                        .setPlayActionIconResourceId(R.drawable.ic_play_arrow)
+                        .setStopActionIconResourceId(R.drawable.ic_stop)
+                        .setSmallIconResourceId(R.mipmap.ic_launcher_foreground)
                         .build();
 
         playerNotificationManager.setUseFastForwardAction(false);
-        playerNotificationManager.setUsePreviousAction(false);
-        playerNotificationManager.setUseNextAction(true);
-        playerNotificationManager.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         playerNotificationManager.setUseRewindAction(false);
+        playerNotificationManager.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        playerNotificationManager.setColor(blue_primary);
         playerNotificationManager.setPriority(PRIORITY_HIGH);
-        playerNotificationManager.setSmallIcon(R.mipmap.ic_launcher_foreground);
         playerNotificationManager.setPlayer(player);
     }
 
@@ -401,6 +410,10 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
     public static ExoPlayer getPlayer() {
         return player;
+    }
+
+    public static List<MusicList> getList() {
+        return musicLists;
     }
 
     //perms handled by Dexter

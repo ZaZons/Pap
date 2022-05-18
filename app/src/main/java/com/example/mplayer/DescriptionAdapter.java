@@ -13,7 +13,7 @@ public class DescriptionAdapter implements PlayerNotificationManager.MediaDescri
 
     MusicList getMusicList(MediaItem currentMediaItem) {
         MusicList currentMusicList = null;
-        for(MusicList m : MainActivity.musicLists) {
+        for(MusicList m : MainActivity.getList()) {
             if(m.getMediaItem() == currentMediaItem)
                 currentMusicList = m;
         }
