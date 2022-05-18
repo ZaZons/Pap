@@ -100,8 +100,8 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         //listener
         listener();
 
-        //notification();
         player.setForegroundMode(true);
+        notification();
 
         //Context context = getApplicationContext();
         //Intent intent = new Intent(this, QuackService.class);
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     }
 
     void notification() {
-        CharSequence name = "0";
+        CharSequence name = "Playback";
         String channelId = "playback_channel";
         String description = "Playback notifications";
         int importance = NotificationManager.IMPORTANCE_LOW;
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                         .build();
 
         playerNotificationManager.setUseFastForwardAction(false);
-        playerNotificationManager.setUsePreviousAction(true);
+        playerNotificationManager.setUsePreviousAction(false);
         playerNotificationManager.setUseNextAction(true);
         playerNotificationManager.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         playerNotificationManager.setUseRewindAction(false);
