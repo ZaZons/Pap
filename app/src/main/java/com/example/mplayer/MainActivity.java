@@ -143,8 +143,8 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         mediaSessionConnector.setPlayer(player);
         mediaSession.setActive(true);
         Context context = getApplicationContext();
-        Intent intent = new Intent();
-        startService(intent);
+        Intent intent = new Intent(this, QuackService.class);
+        context.startForegroundService(intent);
 
 
 //        PendingIntent previousIntent = null;
