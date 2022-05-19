@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
+import com.google.android.exoplayer2.ui.PlayerNotificationManager;
 import com.google.android.exoplayer2.ui.StyledPlayerControlView;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -22,21 +22,19 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.Manifest;
 import android.provider.MediaStore;
-import android.support.v4.media.MediaDescriptionCompat;
-import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -64,12 +62,16 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
     static ExoPlayer player;
 
-    public static final List<MusicList> musicLists = new ArrayList<>();
+    static final List<MusicList> musicLists = new ArrayList<>();
 
     MusicList currentMusicList;
     MusicAdapter musicAdapter;
 
     MediaSessionCompat mediaSession;
+    PlayerNotificationManager playerNotificationManager;
+    NotificationManager notificationChannelManager;
+    static Controls controls;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,8 +117,9 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        player.stop();
         player.setForegroundMode(false);
+        playerNotificationManager.setPlayer(null);
+        //notificationChannelManager.cancelAll();
         player = null;
         mediaSession.setActive(false);
     }
@@ -172,60 +175,58 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 //        playerNotificationManager.setPriority(PRIORITY_HIGH);
 //        playerNotificationManager.setSmallIcon(R.mipmap.ic_launcher_foreground);
 //        playerNotificationManager.setPlayer(player);
+        CharSequence name = "Playback";
+        String channelId = "playback_channel";
+        String description = "Playback notifications";
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+
+        NotificationChannel channel = new NotificationChannel(channelId, name, importance);
+        channel.setDescription(description);
+
+        notificationChannelManager = getSystemService(NotificationManager.class);
+        notificationChannelManager.createNotificationChannel(channel);
+
+        DescriptionAdapter descriptionAdapter = new DescriptionAdapter();
+
+        playerNotificationManager =
+                new PlayerNotificationManager.Builder(getApplicationContext(), 1, channelId)
+                        .setMediaDescriptionAdapter(descriptionAdapter)
+                        .setNextActionIconResourceId(R.drawable.ic_skip_next)
+                        .setPauseActionIconResourceId(R.drawable.ic_pause)
+                        .setPreviousActionIconResourceId(R.drawable.ic_skip_previous)
+                        .setPlayActionIconResourceId(R.drawable.ic_play_arrow)
+                        .setStopActionIconResourceId(R.drawable.ic_stop)
+                        .setSmallIconResourceId(R.mipmap.ic_launcher_foreground)
+                        .build();
+
+        playerNotificationManager.setUseNextActionInCompactView(true);
+        playerNotificationManager.setUsePreviousActionInCompactView(true);
+        playerNotificationManager.setUseFastForwardAction(false);
+        playerNotificationManager.setUseRewindAction(false);
+        playerNotificationManager.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        playerNotificationManager.setColor(blue_primary);
+        playerNotificationManager.setPriority(PRIORITY_HIGH);
+        playerNotificationManager.setPlayer(player);
+//        NotificationReceiver notificationReceiver = new NotificationReceiver();
+//        registerReceiver(notificationReceiver, new IntentFilter(PlayerNotificationManager.ACTION_PREVIOUS));
     }
 
     void controls() {
+        controls = new Controls(player);
         //alternar entre os diferentes tipos de loop (um, todos ou nenhum)
-        loopBtnCard.setOnClickListener(v -> {
-            int repeatMode = player.getRepeatMode();
-
-            switch(repeatMode) {
-                case Player.REPEAT_MODE_OFF:
-                    player.setRepeatMode(Player.REPEAT_MODE_ALL);
-                    break;
-
-                case Player.REPEAT_MODE_ONE:
-                    player.setRepeatMode(Player.REPEAT_MODE_OFF);
-                    break;
-
-                case Player.REPEAT_MODE_ALL:
-                    player.setRepeatMode(Player.REPEAT_MODE_ONE);
-                    break;
-            }
-        });
+        loopBtnCard.setOnClickListener(v -> controls.loop());
 
         //skip to next music
-        nextBtnCard.setOnClickListener(v -> {
-            if(player.hasNextMediaItem())
-                player.seekToNextMediaItem();
-
-            if(!player.isPlaying())
-                play();
-        });
+        nextBtnCard.setOnClickListener(v -> controls.skipNext());
 
         //play or pause
-        playPauseCard.setOnClickListener(v -> {
-            if(player.isPlaying())
-                player.pause();
-            else
-                play();
-        });
+        playPauseCard.setOnClickListener(v -> controls.playPause());
 
         //go to the previous music
-        previousBtnCard.setOnClickListener(v -> {
-            long millisecondsToGoBack = 1000;
-            if(player.getCurrentPosition() >= millisecondsToGoBack) {
-                player.seekTo(0);
-            } else {
-                if(player.hasPreviousMediaItem())
-                    player.seekToPreviousMediaItem();
-            }
-        });
+        previousBtnCard.setOnClickListener(v -> controls.skipPrevious());
 
         //shuffle the queue
-        shuffleBtnCard.setOnClickListener(v ->
-                player.setShuffleModeEnabled(!player.getShuffleModeEnabled())
-        );
+        shuffleBtnCard.setOnClickListener(v -> controls.shuffle());
     }
 
     void listener() {
@@ -431,6 +432,12 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     public static ExoPlayer getPlayer() {
         return player;
     }
+
+    public static List<MusicList> getList() {
+        return musicLists;
+    }
+
+    public static Controls getControls() {return controls;}
 
     //perms handled by Dexter
     void requestPermission() {
