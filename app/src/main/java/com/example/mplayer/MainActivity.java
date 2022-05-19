@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     ImageView playPauseImg;
     RecyclerView musicRecyclerView;
 
-    int blue_primary;
+    static int blue_primary;
     int pink_primary;
 
     static ExoPlayer player;
@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         super.onDestroy();
         player.setForegroundMode(false);
         playerNotificationManager.setPlayer(null);
-        //notificationChannelManager.cancelAll();
+        notificationChannelManager.cancelAll();
         player = null;
         mediaSession.setActive(false);
     }
@@ -138,13 +138,10 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         NotificationManager notificationChannelManager = getSystemService(NotificationManager.class);
         notificationChannelManager.createNotificationChannel(channel);
 
-        mediaSession = new MediaSessionCompat(this, "sample");
+        mediaSession = new MediaSessionCompat(this, "media_session");
         MediaSessionConnector mediaSessionConnector = new MediaSessionConnector(mediaSession);
         mediaSessionConnector.setPlayer(player);
         mediaSession.setActive(true);
-        Context context = getApplicationContext();
-        Intent intent = new Intent(this, QuackService.class);
-        context.startForegroundService(intent);
 
 
 //        PendingIntent previousIntent = null;
@@ -165,24 +162,10 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 //                .setContentText("My Awesome Band")
 //                //.setLargeIcon()
 //                .build();
-//
-//        DescriptionAdapter descriptionAdapter = new DescriptionAdapter();
-//
-//        PlayerNotificationManager playerNotificationManager =
-//                new PlayerNotificationManager.Builder(getApplicationContext(), 1, channelId)
-//                        .setMediaDescriptionAdapter(descriptionAdapter)
-//                        .build();
-//
-//        playerNotificationManager.setUseFastForwardAction(false);
-//        playerNotificationManager.setUsePreviousAction(false);
-//        playerNotificationManager.setUseNextAction(true);
-//        playerNotificationManager.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-//        playerNotificationManager.setUseRewindAction(false);
-//        playerNotificationManager.setPriority(PRIORITY_HIGH);
-//        playerNotificationManager.setSmallIcon(R.mipmap.ic_launcher_foreground);
-//        playerNotificationManager.setPlayer(player);
-//        NotificationReceiver notificationReceiver = new NotificationReceiver();
-//        registerReceiver(notificationReceiver, new IntentFilter(PlayerNotificationManager.ACTION_PREVIOUS));
+        Context context = getApplicationContext();
+        Intent intent = new Intent(this, QuackService.class);
+        context.startForegroundService(intent);
+
     }
 
     void controls() {
@@ -362,6 +345,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
         updateUi(firstItem);
         play();
+
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -415,6 +399,10 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
     public static MediaSessionCompat getMediaSession() {
         return mediaSession;
+    }
+
+    public static int getColorPrimary() {
+        return blue_primary;
     }
 
     //perms handled by Dexter
