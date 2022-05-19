@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.ui.PlayerNotificationManager;
+import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
 import com.google.android.exoplayer2.ui.StyledPlayerControlView;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -22,18 +22,21 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentUris;
-import android.content.Context;
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.Manifest;
 import android.provider.MediaStore;
+import android.support.v4.media.MediaDescriptionCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -66,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     MusicList currentMusicList;
     MusicAdapter musicAdapter;
 
+    MediaSessionCompat mediaSession;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,35 +118,60 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         player.stop();
         player.setForegroundMode(false);
         player = null;
+        mediaSession.setActive(false);
     }
 
     void notification() {
-        CharSequence name = "Playback";
-        String channelId = "playback_channel";
-        String description = "Playback notifications";
-        int importance = NotificationManager.IMPORTANCE_LOW;
-
-        NotificationChannel channel = new NotificationChannel(channelId, name, importance);
-        channel.setDescription(description);
-
-        NotificationManager notificationChannelManager = getSystemService(NotificationManager.class);
-        notificationChannelManager.createNotificationChannel(channel);
-
-        DescriptionAdapter descriptionAdapter = new DescriptionAdapter();
-
-        PlayerNotificationManager playerNotificationManager =
-                new PlayerNotificationManager.Builder(getApplicationContext(), 1, channelId)
-                        .setMediaDescriptionAdapter(descriptionAdapter)
-                        .build();
-
-        playerNotificationManager.setUseFastForwardAction(false);
-        playerNotificationManager.setUsePreviousAction(false);
-        playerNotificationManager.setUseNextAction(true);
-        playerNotificationManager.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-        playerNotificationManager.setUseRewindAction(false);
-        playerNotificationManager.setPriority(PRIORITY_HIGH);
-        playerNotificationManager.setSmallIcon(R.mipmap.ic_launcher_foreground);
-        playerNotificationManager.setPlayer(player);
+//        CharSequence name = "Playback";
+//        String channelId = "playback_channel";
+//        String description = "Playback notifications";
+//        int importance = NotificationManager.IMPORTANCE_LOW;
+//
+//        NotificationChannel channel = new NotificationChannel(channelId, name, importance);
+//        channel.setDescription(description);
+//
+//        NotificationManager notificationChannelManager = getSystemService(NotificationManager.class);
+//        notificationChannelManager.createNotificationChannel(channel);
+//
+//        mediaSession = new MediaSessionCompat(this, "sample");
+//        MediaSessionConnector mediaSessionConnector = new MediaSessionConnector(mediaSession);
+//        mediaSessionConnector.setPlayer(player);
+//        mediaSession.setActive(true);
+//
+//        PendingIntent previousIntent = null;
+//
+//        Notification notification = new NotificationCompat.Builder(getApplicationContext(), channelId)
+//                // Show controls on lock screen even when user hides sensitive content.
+//                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+//                .setSmallIcon(R.drawable.ic_launcher_foreground)
+//                // Add media control buttons that invoke intents in your media service
+//                .addAction(R.drawable.ic_skip_previous, "Previous", previousIntent) // #0
+//                .addAction(R.drawable.ic_pause, "Pause", previousIntent)  // #1
+//                .addAction(R.drawable.ic_skip_next, "Next", previousIntent)     // #2
+//                // Apply the media style template
+//                .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+//                        .setShowActionsInCompactView(1 /* #1: pause button */)
+//                        .setMediaSession(mediaSession.getSessionToken()))
+//                .setContentTitle("Wonderful music")
+//                .setContentText("My Awesome Band")
+//                //.setLargeIcon()
+//                .build();
+//
+//        DescriptionAdapter descriptionAdapter = new DescriptionAdapter();
+//
+//        PlayerNotificationManager playerNotificationManager =
+//                new PlayerNotificationManager.Builder(getApplicationContext(), 1, channelId)
+//                        .setMediaDescriptionAdapter(descriptionAdapter)
+//                        .build();
+//
+//        playerNotificationManager.setUseFastForwardAction(false);
+//        playerNotificationManager.setUsePreviousAction(false);
+//        playerNotificationManager.setUseNextAction(true);
+//        playerNotificationManager.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+//        playerNotificationManager.setUseRewindAction(false);
+//        playerNotificationManager.setPriority(PRIORITY_HIGH);
+//        playerNotificationManager.setSmallIcon(R.mipmap.ic_launcher_foreground);
+//        playerNotificationManager.setPlayer(player);
     }
 
     void controls() {
