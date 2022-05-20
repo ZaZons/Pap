@@ -1,5 +1,6 @@
 package com.example.mplayer;
 
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
 import static androidx.core.app.NotificationCompat.PRIORITY_HIGH;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,6 +40,7 @@ import android.provider.MediaStore;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -124,6 +126,11 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         notificationChannelManager.cancelAll();
         player = null;
         mediaSession.setActive(false);
+    }
+
+    public void search(View view) {
+        Intent intent = new Intent(this, RecyclerViewSearch.class);
+        startActivity(intent);
     }
 
     void notification() {
