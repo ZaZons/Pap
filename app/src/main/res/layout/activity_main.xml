@@ -6,6 +6,12 @@
     android:orientation="horizontal"
     android:background="#191a1f">
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="drawer"
+        android:onClick="drawer"/>
+
 <!--    Top bar-->
 <!--    <RelativeLayout-->
 <!--        android:id="@+id/topBar"-->

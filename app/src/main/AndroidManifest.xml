@@ -18,9 +18,6 @@
             android:label="@string/title_activity_slider"
             android:theme="@style/Theme.MPlayer.NoActionBar" />
         <activity
-            android:name=".RecyclerViewSearchActivity"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

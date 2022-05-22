@@ -1,4 +1,4 @@
-package com.example.mplayer.ui.gallery;
+package com.example.mplayer.ui.playlists;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,20 +12,20 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.mplayer.databinding.FragmentGalleryBinding;
 
-public class GalleryFragment extends Fragment {
+public class PlaylistsFragment extends Fragment {
 
     private FragmentGalleryBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        GalleryViewModel galleryViewModel =
-                new ViewModelProvider(this).get(GalleryViewModel.class);
+        PlaylistsViewModel playlistsViewModel =
+                new ViewModelProvider(this).get(PlaylistsViewModel.class);
 
         binding = FragmentGalleryBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         final TextView textView = binding.textGallery;
-        galleryViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        playlistsViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 

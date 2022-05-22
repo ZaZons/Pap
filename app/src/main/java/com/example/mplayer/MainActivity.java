@@ -184,8 +184,8 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 //        notificationChannelManager.cancelAll();
     }
 
-    public void search(View view) {
-        Intent intent = new Intent(this, RecyclerViewSearchActivity.class);
+    public void drawer(View view) {
+        Intent intent = new Intent(this, SliderActivity.class);
         startActivity(intent);
     }
 
