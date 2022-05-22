@@ -13,6 +13,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MPlayer">
         <activity
+            android:name=".SliderActivity"
+            android:exported="false"
+            android:label="@string/title_activity_slider"
+            android:theme="@style/Theme.MPlayer.NoActionBar" />
+        <activity
             android:name=".RecyclerViewSearchActivity"
             android:exported="false" />
         <activity
@@ -25,7 +30,9 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".QuackService" android:foregroundServiceType="mediaPlayback" />
+        <service
+            android:name=".QuackService"
+            android:foregroundServiceType="mediaPlayback" />
     </application>
 
 </manifest>
