@@ -1,11 +1,10 @@
 package com.example.mplayer;
 
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
-import static androidx.core.app.NotificationCompat.PRIORITY_HIGH;
-
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,17 +29,21 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.Manifest;
 import android.provider.MediaStore;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -59,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     CardView repeatOneIndicator;
     CardView shuffleBtnCard;
     ImageView playPauseImg;
-    RecyclerView musicRecyclerView;
+    static RecyclerView musicRecyclerView;
 
     static int blue_primary;
     int pink_primary;
@@ -69,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     static final List<MusicList> musicLists = new ArrayList<>();
 
     MusicList currentMusicList;
-    MusicAdapter musicAdapter;
+    static MusicAdapter musicAdapter;
 
     static MediaSessionCompat mediaSession;
     PlayerNotificationManager playerNotificationManager;
@@ -79,7 +82,9 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.Theme_MPlayer);
         setContentView(R.layout.activity_main);
+//        customActionBar();
 
         //menuBtn = findViewById(R.id.menuBtn);
         loopBtnCard = findViewById(R.id.loopBtn);
@@ -111,33 +116,84 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         listener();
 
         player.setForegroundMode(true);
-        notification();
 
         //Context context = getApplicationContext();
         //Intent intent = new Intent(this, QuackService.class);
         //context.startForegroundService(intent);
+
+        customActionBar();
+    }
+
+    void customActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null) {
+            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setCustomView(R.layout.custom_action_bar);
+        }
+    }
+
+    int resolveColor(int ref) {
+        TypedValue value = new TypedValue();
+        getTheme().resolveAttribute(ref, value, true);
+        return value.data;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.search_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.actionSearch);
+
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filter(newText);
+                return false;
+            }
+        });
+        return true;
+    }
+
+    void filter(String text) {
+        List<MusicList> filteredList = new ArrayList<>();
+
+        for(MusicList item : musicLists) {
+            if(item.getTitle().toLowerCase().contains(text.toLowerCase())) {
+                filteredList.add(item);
+            }
+        }
+        musicAdapter.filter(filteredList);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         player.setForegroundMode(false);
-        playerNotificationManager.setPlayer(null);
-        notificationChannelManager.cancelAll();
+//        playerNotificationManager.setPlayer(null);
         player = null;
         mediaSession.setActive(false);
+//        notificationChannelManager.cancelAll();
     }
 
     public void search(View view) {
-        Intent intent = new Intent(this, RecyclerViewSearch.class);
+        Intent intent = new Intent(this, RecyclerViewSearchActivity.class);
         startActivity(intent);
     }
 
     void notification() {
         CharSequence name = "Playback";
         String channelId = "playback_channel";
-        String description = "Playback notifications";
-        int importance = NotificationManager.IMPORTANCE_LOW;
+        String description = "Playback notification";
+        int importance = NotificationManager.IMPORTANCE_HIGH;
 
         NotificationChannel channel = new NotificationChannel(channelId, name, importance);
         channel.setDescription(description);
@@ -149,6 +205,10 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         MediaSessionConnector mediaSessionConnector = new MediaSessionConnector(mediaSession);
         mediaSessionConnector.setPlayer(player);
         mediaSession.setActive(true);
+
+        Context context = getApplicationContext();
+        Intent intent = new Intent(this, QuackService.class);
+        context.startForegroundService(intent);
 
 
 //        PendingIntent previousIntent = null;
@@ -169,9 +229,6 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 //                .setContentText("My Awesome Band")
 //                //.setLargeIcon()
 //                .build();
-        Context context = getApplicationContext();
-        Intent intent = new Intent(this, QuackService.class);
-        context.startForegroundService(intent);
 
     }
 
@@ -287,6 +344,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
             } else if (!cursor.moveToNext()) {
                 Toast.makeText(this, "No music found", Toast.LENGTH_SHORT).show();
             } else {
+                int id = 0;
                 cursor.moveToFirst();
                 do {
                     long cursorId = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
@@ -299,14 +357,15 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                     Uri getMusicFileUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cursorId);
 
                     //construir um objeto de cada musica com as propriedades adquiridas provisoriamente
-                    final MusicList musicList = new MusicList(getMusicFileName, getArtistName, generateTime(getDuration), false, getMusicFileUri);
+                    final MusicList musicList = new MusicList(id, getMusicFileName, getArtistName, generateTime(getDuration), false, getMusicFileUri);
 
                     //adicionar o objeto a lista
                     musicLists.add(musicList);
+                    id++;
                 } while(cursor.moveToNext());
 
                 //criar e adicionar o adaptador ao recyclerView
-                musicAdapter = new MusicAdapter(musicLists, MainActivity.this);
+                musicAdapter = new MusicAdapter(musicLists, this);
                 musicRecyclerView.setAdapter(musicAdapter);
 
                 Toast.makeText(this, musicAdapter.getItemCount() + " Songs found", Toast.LENGTH_SHORT).show();
@@ -321,15 +380,20 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
     //evento de quando o utilizador seleciona uma musica do recycler view
     @Override
-    public void onChanged(int position) {
-        //get o mediaItem do objeto selecionado
-        MusicList firstItem = musicLists.get(position);
+    public void onChanged(int id) {
+        MusicList firstItem = musicLists.get(id);
+
+        if(firstItem == null)
+            return;
+
+//        MusicList firstItem = musicLists.get(position);
         MediaItem mediaItem = firstItem.getMediaItem();
 
         //se o media item q selecionar ja tiver a dar ent ele retorna
-        if(player.getCurrentMediaItem() == mediaItem)
-
+        if(player.getCurrentMediaItem() == mediaItem) {
+            player.seekTo(0);
             return;
+        }
 
         //resetar o player
         player.stop();
@@ -339,16 +403,18 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
         //por os itens todos da lista em queue
         //quando chega ao ultimo volta para o primeiro, e quando chega ao selecionado baza do loop
-        for(int i = position + 1; i < musicAdapter.getItemCount() + 1; i++) {
-            if(i == musicAdapter.getItemCount())
+        for(int i = id + 1; i < musicLists.size() + 1; i++) {
+            if(i == musicLists.size())
                 i = 0;
 
-            if(i == position)
+            if(i == id)
                 break;
 
             MediaItem nextMediaItem = musicLists.get(i).getMediaItem();
             player.addMediaItem(nextMediaItem);
         }
+
+        notification();
 
         updateUi(firstItem);
         play();

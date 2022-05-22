@@ -36,6 +36,47 @@ public class QuackService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        DescriptionAdapter descriptionAdapter = new DescriptionAdapter();
+
+        PlayerNotificationManager playerNotificationManager =
+                new PlayerNotificationManager.Builder(getApplicationContext(), 1, "playback_channel")
+                        .setMediaDescriptionAdapter(descriptionAdapter)
+                        .setNextActionIconResourceId(R.drawable.ic_skip_next)
+                        .setPauseActionIconResourceId(R.drawable.ic_pause)
+                        .setPreviousActionIconResourceId(R.drawable.ic_skip_previous)
+                        .setPlayActionIconResourceId(R.drawable.ic_play_arrow)
+                        .setSmallIconResourceId(R.mipmap.ic_launcher)
+                        .setNotificationListener(new PlayerNotificationManager.NotificationListener() {
+                            @Override
+                            public void onNotificationPosted(int notificationId, Notification notification, boolean ongoing) {
+                                PlayerNotificationManager.NotificationListener.super.onNotificationPosted(notificationId, notification, ongoing);
+                                if(!ongoing) {
+                                    stopSelf();
+                                } else {
+                                    startForeground(startId, notification);
+                                }
+                            }
+
+                            @Override
+                            public void onNotificationCancelled(int notificationId, boolean dismissedByUser) {
+                                PlayerNotificationManager.NotificationListener.super.onNotificationCancelled(notificationId, dismissedByUser);
+                                stopSelf();
+                            }
+                        })
+                        .build();
+
+
+        playerNotificationManager.setUseNextActionInCompactView(true);
+        playerNotificationManager.setUsePreviousActionInCompactView(true);
+        playerNotificationManager.setUseFastForwardAction(false);
+        playerNotificationManager.setUseRewindAction(false);
+        playerNotificationManager.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        playerNotificationManager.setColor(MainActivity.getColorPrimary());
+        playerNotificationManager.setColorized(false);
+        playerNotificationManager.setPriority(PRIORITY_HIGH);
+        playerNotificationManager.setPlayer(MainActivity.getPlayer());
+
+        return START_NOT_STICKY;
 //        MediaControllerCompat controller = mediaSession.getController();
 //        MediaMetadataCompat mediaMetadata = controller.getMetadata();
 //        MediaDescriptionCompat description = mediaMetadata.getDescription();
@@ -99,45 +140,6 @@ public class QuackService extends Service {
 //                //.setLargeIcon()
 //                .build();
 
-        DescriptionAdapter descriptionAdapter = new DescriptionAdapter();
-
-        PlayerNotificationManager playerNotificationManager =
-                new PlayerNotificationManager.Builder(getApplicationContext(), 1, "playback_channel")
-                        .setMediaDescriptionAdapter(descriptionAdapter)
-                        .setNextActionIconResourceId(R.drawable.ic_skip_next)
-                        .setPauseActionIconResourceId(R.drawable.ic_pause)
-                        .setPreviousActionIconResourceId(R.drawable.ic_skip_previous)
-                        .setPlayActionIconResourceId(R.drawable.ic_play_arrow)
-                        .setStopActionIconResourceId(R.drawable.ic_stop)
-                        .setSmallIconResourceId(R.mipmap.ic_launcher_foreground)
-                        .setNotificationListener(new PlayerNotificationManager.NotificationListener() {
-                            @Override
-                            public void onNotificationPosted(int notificationId, Notification notification, boolean ongoing) {
-                                PlayerNotificationManager.NotificationListener.super.onNotificationPosted(notificationId, notification, ongoing);
-                                if(!ongoing) {
-                                    stopForeground(false);
-                                } else {
-                                    startForeground(startId, notification);
-                                }
-                            }
-
-                            @Override
-                            public void onNotificationCancelled(int notificationId, boolean dismissedByUser) {
-                                PlayerNotificationManager.NotificationListener.super.onNotificationCancelled(notificationId, dismissedByUser);
-                                stopSelf();
-                            }
-                        })
-                        .build();
-
-        playerNotificationManager.setUseNextActionInCompactView(true);
-        playerNotificationManager.setUsePreviousActionInCompactView(true);
-        playerNotificationManager.setUseFastForwardAction(false);
-        playerNotificationManager.setUseRewindAction(false);
-        playerNotificationManager.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-        playerNotificationManager.setColor(MainActivity.getColorPrimary());
-        playerNotificationManager.setColorized(false);
-        playerNotificationManager.setPriority(PRIORITY_HIGH);
-        playerNotificationManager.setPlayer(MainActivity.getPlayer());
 //
 //        Intent notificationIntent = new Intent(this, MainActivity.class);
 //        PendingIntent pendingIntent =
@@ -152,7 +154,6 @@ public class QuackService extends Service {
 //        Log.d("Service", "Service started");
 //
 //        startForeground(0, notification);
-        return START_NOT_STICKY;
     }
 
 //    ExoPlayer player = MainActivity.getPlayer();

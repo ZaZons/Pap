@@ -2,6 +2,7 @@ package com.example.mplayer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,7 @@ import java.util.List;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder> {
 
-    private final List<MusicList> list;
+    private List<MusicList> list;
     private final ChangeSongListener changeSongListener;
 
     public MusicAdapter(List<MusicList> list, Context context) {
@@ -43,7 +44,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
         else
             holder.rootLayout.setBackgroundResource(R.drawable.bg_blue);
 
-        holder.rootLayout.setOnClickListener(v -> changeSongListener.onChanged(position));
+        holder.rootLayout.setOnClickListener(v -> changeSongListener.onChanged(list2.getId()));
     }
 
     @Override
@@ -71,13 +72,20 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
                 contextMenu.setOnCreateContextMenuListener(this);
             });*/
         }
+    }
+
+    public void filter(List<MusicList> filteredList) {
+        list = filteredList;
+        notifyDataSetChanged();
+    }
+
         /*
         @Override
         public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
             contextMenu.add(this.getAbsoluteAdapterPosition(), Menu.NONE, 0, "Play now");
             contextMenu.add(this.getAbsoluteAdapterPosition(), Menu.NONE, 0, "Play next");
         }*/
-    }
+
     /*
     public static class ViewHolder extends RecyclerView.ViewHolder
             implements View.OnCreateContextMenuListener {

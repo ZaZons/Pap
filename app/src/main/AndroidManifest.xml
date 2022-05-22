@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MPlayer">
         <activity
-            android:name=".RecyclerViewSearch"
+            android:name=".RecyclerViewSearchActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
@@ -25,9 +25,7 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".QuackService"
-            android:foregroundServiceType="mediaPlayback" />
+        <service android:name=".QuackService" android:foregroundServiceType="mediaPlayback" />
     </application>
 
 </manifest>

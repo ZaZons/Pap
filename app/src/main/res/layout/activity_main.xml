@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:background="#191a1f">
 
-    <!--Top bar-->
+<!--    Top bar-->
     <RelativeLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
@@ -18,12 +18,12 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_centerVertical="true"
-            android:layout_marginBottom="17dp"
             android:layout_marginTop="17dp"
+            android:layout_marginBottom="17dp"
             android:text="@string/app_name"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -35,7 +35,7 @@
                 android:id="@+id/searchBtn"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:onClick="search"
+                android:onClick=""
                 app:cardBackgroundColor="@color/blue_primary"
                 app:cardCornerRadius="15dp">
 
@@ -50,7 +50,7 @@
 
         </LinearLayout>
 
-<!--
+
         <LinearLayout
             android:id="@+id/menuBtn"
             android:layout_width="wrap_content"
@@ -66,15 +66,14 @@
                 android:layout_margin="10dp"
                 android:src="@drawable/ic_menu" />
 
-        </LinearLayout>-->
+        </LinearLayout>
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/musicRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/controlBar"
-        android:layout_below="@+id/topBar"
         android:layout_marginBottom="10dp" />
 
     <LinearLayout

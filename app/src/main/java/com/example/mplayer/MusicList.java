@@ -6,17 +6,21 @@ import com.google.android.exoplayer2.MediaItem;
 
 public class MusicList {
 
+    private final int id;
     private boolean isPlaying;
     private final String title, artist, duration;
     private final MediaItem mediaItem;
 
-    public MusicList(String title, String artist, String duration, boolean isPlaying, Uri musicFile) {
+    public MusicList(int id, String title, String artist, String duration, boolean isPlaying, Uri musicFile) {
+        this.id = id;
         this.title = title;
         this.artist = artist;
         this.duration = duration;
         this.isPlaying = isPlaying;
         this.mediaItem = MediaItem.fromUri(musicFile);
     }
+
+    public int getId() { return id; }
 
     public String getTitle() {
         return title;
