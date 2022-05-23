@@ -36,6 +36,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.Manifest;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
@@ -47,6 +48,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
         //context.startForegroundService(intent);
 
         customActionBar();
+        writeFile();
     }
 
     void customActionBar() {
@@ -187,6 +195,30 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     public void drawer(View view) {
         Intent intent = new Intent(this, SliderActivity.class);
         startActivity(intent);
+    }
+
+    void writeFile() {
+
+//        FileOutputStream fileout = null;
+//        try {
+//            fileout = openFileOutput("mytextfile.txt", MODE_PRIVATE);
+//            OutputStreamWriter outputWriter=new OutputStreamWriter(fileout);
+//            outputWriter.write("text");
+//            outputWriter.close();
+//            File root = new File(getFilesDir(), "Playlists");
+//            if (!root.exists()) {
+//                root.mkdirs();
+//            }
+//            File gpxfile = new File(root, "fds.txt");
+//            FileWriter writer = new FileWriter(gpxfile);
+//            writer.append("sBody");
+//            writer.flush();
+//            writer.close();
+            Log.d("files", "directory: " + getFilesDir());
+//            Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_LONG).show();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     void notification() {
