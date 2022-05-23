@@ -48,9 +48,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -76,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
     static ExoPlayer player;
 
-    static final List<MusicList> musicLists = new ArrayList<>();
+    static final ArrayList<MusicList> musicLists = new ArrayList<>();
 
     MusicList currentMusicList;
     static MusicAdapter musicAdapter;
@@ -198,27 +200,38 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
     }
 
     void writeFile() {
-
-//        FileOutputStream fileout = null;
-//        try {
+        try {
 //            fileout = openFileOutput("mytextfile.txt", MODE_PRIVATE);
-//            OutputStreamWriter outputWriter=new OutputStreamWriter(fileout);
+//            OutputStreamWriter outputWriter = new OutputStreamWriter(fileout);
 //            outputWriter.write("text");
 //            outputWriter.close();
-//            File root = new File(getFilesDir(), "Playlists");
-//            if (!root.exists()) {
-//                root.mkdirs();
-//            }
-//            File gpxfile = new File(root, "fds.txt");
-//            FileWriter writer = new FileWriter(gpxfile);
-//            writer.append("sBody");
-//            writer.flush();
-//            writer.close();
-            Log.d("files", "directory: " + getFilesDir());
-//            Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_LONG).show();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+
+            File root = new File(getFilesDir(), "Playlists");
+            if (!root.exists()) {
+                root.mkdirs();
+            }
+            File playlistFile = new File(root, "fds.txt");
+
+            FileReader reader = new FileReader(playlistFile);
+            BufferedReader br = new BufferedReader(reader);
+            String line = br.readLine();
+
+            FileWriter writer = new FileWriter(playlistFile);
+
+            writer.append("Hello there\nGeneral kenobi");
+            writer.close();
+            Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_LONG).show();
+
+            int nlines = 0;
+            while(line != null) {
+                nlines++;
+                Log.d("files", "reader: " + line);
+                Log.d("files", "reader lines: " + nlines);
+                line = br.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     void notification() {
