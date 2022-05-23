@@ -15,6 +15,10 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
 import com.google.android.exoplayer2.ui.PlayerNotificationManager;
 import com.google.android.exoplayer2.ui.StyledPlayerControlView;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
@@ -48,13 +52,20 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,8 +134,6 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
         //listener
         listener();
-
-        player.setForegroundMode(true);
 
         //Context context = getApplicationContext();
         //Intent intent = new Intent(this, QuackService.class);
@@ -201,34 +210,41 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
 
     void writeFile() {
         try {
-//            fileout = openFileOutput("mytextfile.txt", MODE_PRIVATE);
-//            OutputStreamWriter outputWriter = new OutputStreamWriter(fileout);
-//            outputWriter.write("text");
-//            outputWriter.close();
-
             File root = new File(getFilesDir(), "Playlists");
             if (!root.exists()) {
                 root.mkdirs();
             }
-            File playlistFile = new File(root, "fds.txt");
 
-            FileReader reader = new FileReader(playlistFile);
-            BufferedReader br = new BufferedReader(reader);
-            String line = br.readLine();
+            File playlistFile = new File(root, "fds.json");
+            if(!playlistFile.exists()) {
+                playlistFile.createNewFile();
+            }
+
 
             FileWriter writer = new FileWriter(playlistFile);
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-            writer.append("Hello there\nGeneral kenobi");
+            JsonElement jsonElement = gson.toJsonTree(musicLists.get(0), MusicList.class);
+            JsonObject jsonObject = (JsonObject) jsonElement;
+
+            writer.append(gson.toJson(jsonObject));
             writer.close();
-            Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_LONG).show();
+//
+//            FileReader reader = new FileReader(playlistFile);
+//            BufferedReader br = new BufferedReader(reader);
+//            String line = br.readLine();
+//
+//            Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_LONG).show();
+//
+//            int nlines = 0;
+//            while(line != null) {
+//                nlines++;
+//                line = br.readLine();
+//            }
 
-            int nlines = 0;
-            while(line != null) {
-                nlines++;
-                Log.d("files", "reader: " + line);
-                Log.d("files", "reader lines: " + nlines);
-                line = br.readLine();
-            }
+//            String jsonF = "{'name' : 'mkyong'}";
+//            MusicList hey = gson.fromJson(json, Staff.class);
+//            Log.d("files", "object: " + hey);
         } catch (IOException e) {
             e.printStackTrace();
         }
