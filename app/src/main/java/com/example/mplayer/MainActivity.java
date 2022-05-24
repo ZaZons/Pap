@@ -220,17 +220,16 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
                 playlistFile.createNewFile();
             }
 
-
             FileWriter writer = new FileWriter(playlistFile);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
             JsonElement jsonElement = gson.toJsonTree(musicLists.get(0), MusicList.class);
             JsonObject jsonObject = (JsonObject) jsonElement;
-
             writer.append(gson.toJson(jsonObject));
             writer.close();
 //
-//            FileReader reader = new FileReader(playlistFile);
+            FileReader reader = new FileReader(playlistFile);
+            Log.d("files", "json file: " + reader);
 //            BufferedReader br = new BufferedReader(reader);
 //            String line = br.readLine();
 //
