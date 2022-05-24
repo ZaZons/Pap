@@ -3,7 +3,6 @@ package com.example.mplayer;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,7 +17,7 @@ import com.google.android.exoplayer2.ui.StyledPlayerControlView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
@@ -35,12 +34,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.Manifest;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
@@ -52,21 +48,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -221,25 +207,36 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
             }
 
             FileWriter writer = new FileWriter(playlistFile);
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = new Gson();
 
-            JsonElement jsonElement = gson.toJsonTree(musicLists.get(0), MusicList.class);
-            JsonObject jsonObject = (JsonObject) jsonElement;
-            writer.append(gson.toJson(jsonObject));
+            String jsonObject = gson.toJson(new MusicList(3, "Example", "exampleArtist", "00:00", false, null), MusicList.class);
+            writer.write(jsonObject);
             writer.close();
-//
+
             FileReader reader = new FileReader(playlistFile);
-            Log.d("files", "json file: " + reader);
-//            BufferedReader br = new BufferedReader(reader);
+            String line = new BufferedReader(reader).readLine();
+
+            MusicList obj = gson.fromJson(line, MusicList.class);
+            Log.d("files", "object: " + obj.getArtist());
+
+//            int lines = 0;
+//            String result = "";
+//
+////            while(line != null) {
+////                lines++;
+////                result += line;
+////                line = br.readLine();
+////            }
+//            Log.d("files", "number of lines: " + lines);
+
+//            line = line.substring(1, line.length() - 1);
+//            Log.d("files", "result string3: " + line);
+
 //            String line = br.readLine();
 //
 //            Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_LONG).show();
 //
-//            int nlines = 0;
-//            while(line != null) {
-//                nlines++;
-//                line = br.readLine();
-//            }
+
 
 //            String jsonF = "{'name' : 'mkyong'}";
 //            MusicList hey = gson.fromJson(json, Staff.class);
