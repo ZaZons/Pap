@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
@@ -207,40 +208,32 @@ public class MainActivity extends AppCompatActivity implements ChangeSongListene
             }
 
             FileWriter writer = new FileWriter(playlistFile);
-            Gson gson = new Gson();
+//            Gson gson = new Gson();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-            String jsonObject = gson.toJson(new MusicList(3, "Example", "exampleArtist", "00:00", false, null), MusicList.class);
+//            String jsonObject = gson.toJson(new MusicList(3, "Example", "exampleArtist", "00:00", false, null), MusicList.class);
+            ArrayList<MusicList> test = musicLists;
+            for(MusicList list : test) {
+                list.setMediaItem(null);
+            }
+//            String jsonObject = gson.toJson(test, MusicList.class);
+            String jsonObject = gson.toJson(test, new TypeToken<ArrayList<MusicList>>(){}.getType());
             writer.write(jsonObject);
             writer.close();
 
             FileReader reader = new FileReader(playlistFile);
-            String line = new BufferedReader(reader).readLine();
+            BufferedReader br = new BufferedReader(reader);
+//            String line = new BufferedReader(reader).readLine();
 
-            MusicList obj = gson.fromJson(line, MusicList.class);
-            Log.d("files", "object: " + obj.getArtist());
+//            MusicList obj = gson.fromJson(br, MusicList.class);
+            ArrayList<MusicList> obj = gson.fromJson(br, new TypeToken<ArrayList<MusicList>>(){}.getType());
+            MusicList obj1 = obj.get(0);
+            Log.d("files", "object: " + obj1.getTitle());
+//            Log.d("files", "object: " + obj.getTitle());
+            Log.d("files", "media item: " + obj1.getMediaItem());
+            obj1.createMediaItem();
+            Log.d("files", "media item: " + obj1.getMediaItem());
 
-//            int lines = 0;
-//            String result = "";
-//
-////            while(line != null) {
-////                lines++;
-////                result += line;
-////                line = br.readLine();
-////            }
-//            Log.d("files", "number of lines: " + lines);
-
-//            line = line.substring(1, line.length() - 1);
-//            Log.d("files", "result string3: " + line);
-
-//            String line = br.readLine();
-//
-//            Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_LONG).show();
-//
-
-
-//            String jsonF = "{'name' : 'mkyong'}";
-//            MusicList hey = gson.fromJson(json, Staff.class);
-//            Log.d("files", "object: " + hey);
         } catch (IOException e) {
             e.printStackTrace();
         }
